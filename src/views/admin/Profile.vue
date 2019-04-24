@@ -2,12 +2,26 @@
   <div class="profile">
     <v-layout row wrap>
       <v-flex xs12 md2 class="text-xs-center pb-2">
-        <v-avatar size="150" class="card--flex-toolbar">
-          <img
-            src="https://images.unsplash.com/photo-1554653622-c3d14492232e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1427&q=80"
-          >
-        </v-avatar>
-        <p class="mt-1"><v-chip >Position</v-chip></p>
+        <v-hover>
+          <v-avatar slot-scope="{ hover }" size="150" color="grey lighten-2">
+            <v-fab-transition>
+              <v-btn
+                v-show="hover? true: false"
+                fab
+                class="mb-3"
+                absolute
+                small
+                bottom
+                left
+                @click="dialog = !dialog"
+              ><v-icon>insert_photo</v-icon></v-btn>
+            </v-fab-transition>
+            <v-icon size="130">person</v-icon>
+          </v-avatar>
+        </v-hover>
+        <p class="mt-1">
+          <v-chip dark :style="{ 'background-color': color}">{{position}}</v-chip>
+        </p>
       </v-flex>
 
       <v-flex xs12 md10>
@@ -15,72 +29,57 @@
           <v-form>
             <v-container py-0>
               <v-layout wrap>
-                <v-flex xs12 md4>
-                  <v-text-field label="Company (disabled)" disabled/>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field class="purple-input" label="User Name"/>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field label="Email Address" class="purple-input"/>
+                <v-flex xs12 md6>
+                  <v-text-field v-model="user.username" label="Username" disabled="true"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field label="First Name" class="purple-input"/>
+                  <v-text-field v-model="user.name" label="Nama Lengkap"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field label="Last Name" class="purple-input"/>
+                  <v-text-field v-model="user.email" label="Email" class="purple-input"/>
                 </v-flex>
-                <v-flex xs12 md12>
-                  <v-text-field label="Adress" class="purple-input"/>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field label="City" class="purple-input"/>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field label="Country" class="purple-input"/>
-                </v-flex>
-                <v-flex xs12 md4>
-                  <v-text-field class="purple-input" label="Postal Code" type="number"/>
+                <v-flex xs12 md6>
+                  <v-text-field v-model="user.phone" label="Nomor Handphone"/>
                 </v-flex>
                 <v-flex xs12>
-                  <v-textarea
-                    class="purple-input"
-                    label="About Me"
-                    value="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                  />
+                  <v-textarea v-model="user.address" label="Alamat"/>
                 </v-flex>
-                <!-- <v-flex xs12 text-xs-right>
+                <v-flex xs12 text-xs-right>
                   <v-btn class="mx-0 font-weight-light" color="success">Update Profile</v-btn>
-                </v-flex>-->
+                </v-flex>
               </v-layout>
             </v-container>
           </v-form>
         </v-card>
       </v-flex>
-      <!-- <v-flex xs12 md4>
-        <v-card class="v-card-profile">
-          <v-card-text class="text-xs-center">
-            <h6 class="category text-gray font-weight-thin mb-3">CEO / CO-FOUNDER</h6>
-            <h4 class="card-title font-weight-light">Alec Thompson</h4>
-            <p
-              class="card-description font-weight-light"
-            >Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...</p>
-            <v-btn color="success" round class="font-weight-light">Follow</v-btn>
-          </v-card-text>
-        </v-card>
-      </v-flex>-->
     </v-layout>
   </div>
 </template>
 <script>
 export default {
-  //
+  computed: {
+    color() {
+      return this.user.role == 2 ? "#D4AF37" : "#000";
+    },
+    position() {
+      return this.user.role == 2 ? "Master Admin" : "Admin";
+    }
+  },
+  created() {
+    this.user = this.$store.getters["user/user"];
+    console.log("user", this.user);
+  },
+  data() {
+    return {
+      user: {}
+    };
+  },
+  methods: {}
 };
 </script>
 
 <style scoped>
-.card--flex-toolbar {
-  z-index: 2;
-  /* margin-top: -50px; */
+.scale-up {
+  transform: scale(2.5, 2.5);
 }
 </style>

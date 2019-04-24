@@ -11,29 +11,30 @@
           </v-list-tile>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar app flat clipped-left>
-        <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-        <v-toolbar-title>Admin</v-toolbar-title>
+      <v-toolbar app flat dark clipped-left color="primary">
+        <v-toolbar-side-icon @click="drawer = !drawer">
+        </v-toolbar-side-icon>
+        <v-toolbar-title class="font-weight-light" >Yayasan <span class="font-weight-medium"> Kasih Keluarga</span></v-toolbar-title>
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
           <v-menu offset-y :close-on-content-click="false" max-width="300" nudge-width="300" v-model="menu">
             <v-list-tile avatar align-center slot="activator">
-              <v-avatar size="35" color="grey">
-                <img src="../assets/logo.png" alt="alt">
+              <v-avatar size="35" color="grey lighten-2">
+                    <v-icon size="30">person</v-icon>
               </v-avatar>
             </v-list-tile>
             <v-card>
               <v-list two-line>
                 <v-list-tile avatar route :to="{name: 'profile'}" @click="menu = false">
-                  <v-list-tile-avatar size="50" >
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+                  <v-list-tile-avatar size="50" color="grey lighten-2">
+                    <v-icon size="45">person</v-icon>
                   </v-list-tile-avatar>
 
                   <v-list-tile-content >
-                    <v-list-tile-title class="text-truncate">Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum commodi blanditiis rem adipisci nulla aliquam ullam nesciunt cumque ipsa, vitae, optio repudiandae quis facere ratione aliquid quam architecto! Fuga, laudantium.</v-list-tile-title>
+                    <v-list-tile-title class="text-truncate ml-2">{{user.name}}</v-list-tile-title>
                     <v-list-tile-sub-title>
-                     <v-chip dark color="primary" small>Outline</v-chip>
+                     <v-chip dark :style="{ 'background-color': color}" small>{{position}}</v-chip>
                     </v-list-tile-sub-title>
                     
                   </v-list-tile-content>
@@ -65,8 +66,21 @@
 
 <script>
 export default {
+  computed:{
+    color(){
+      return this.user.role == 2 ? '#D4AF37' : '#000'
+    },
+    position(){
+      return this.user.role == 2 ? 'Master Admin' : 'Admin'
+    }
+  },
+  created(){
+    this.user = this.$store.getters['user/user'];
+  },
   data() {
     return {
+      admin: '#033',
+      user: {},
       drawer: null,
       menu: false,
       items: [

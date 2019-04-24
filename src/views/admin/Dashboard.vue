@@ -21,7 +21,14 @@
 </template>
 
 <script>
-export default {};
+export default {
+  mounted(){
+    console.log('user', this.$store.getters['user/GET_USER']);
+
+  },
+  created(){
+  }
+};
 </script>
 
 <style>

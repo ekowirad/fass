@@ -3,8 +3,9 @@ import VueRouter from 'vue-router'
 
 import Root from '../components/Root'
 import AdminRoot from '../components/AdminRoot'
+import Login from '../components/Login'
 import admin from './admin'
-import guard from './guard'
+// import guard from './guard'
 
 
 
@@ -23,11 +24,18 @@ const router = new VueRouter({
             name: 'admin',
             component: AdminRoot,
             children: admin,
-            meta: { requiresAuth: true }
+            // meta: { requiresAuth: true }
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: Login
         }
 
     ]
 });
+
+
 
 
 export default router;

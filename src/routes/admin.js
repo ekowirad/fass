@@ -1,6 +1,7 @@
 import Dashboard from '../views/admin/Dashboard'
 import Member from '../views/admin/Member'
 import Profile from '../views/admin/Profile'
+import Prt from '../views/admin/Prt'
 
 
 const admin = [
@@ -17,7 +18,12 @@ const admin = [
     {
         path: 'profile',
         name: 'profile',
-        component: Profile
+        component: Profile,
+    },
+    {
+        path: 'prt',
+        name: 'prt',
+        component: Prt
 
     }
 ]
