@@ -105,7 +105,7 @@ export default {
         .get(`labors/${id}`, this.headers)
         .then(ress => {
           this.labors = ress.data.data;
-          console.log(this.users);
+          console.log(this.labors);
         })
         .catch(e => {
           console.log(e.response);

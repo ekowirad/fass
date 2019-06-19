@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-profile">
+  <div class="admin-profile mt-5">
     <v-layout row wrap>
       <v-flex xs12 md2 class="text-xs-center pb-2">
         <v-hover>
