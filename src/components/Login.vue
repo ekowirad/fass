@@ -92,7 +92,7 @@ export default {
             password: this.password
           })
           .then(ress => {
-            this.$store.commit("user/SET_USER", ress.data);
+            this.$store.commit("user/SET_CURRENT_USER", ress.data);
             window.localStorage.setItem('api_token', ress.data.api_token)
             this.$router.push({ name: "dashboard" });
             this.user = this.loadShow = false;

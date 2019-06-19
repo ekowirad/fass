@@ -1,8 +1,8 @@
 <template>
-  <div class="admin-home">
+  <div class="admin-list">
     <v-layout row wrap>
       <v-flex xs12 text-xs-right>
-        <v-btn depressed color="success" class="mb-2">
+        <v-btn depressed color="success" class="mb-2" :to="{name: 'admin-post'}">
           <v-icon left dark>add</v-icon>Admin Baru
         </v-btn>
       </v-flex>
@@ -25,17 +25,17 @@
     <v-list>
       <template v-for="(user, index) in users">
         <v-hover :key="index">
-          <v-list-tile slot-scope="{hover}" :to="{}">
+          <v-list-tile slot-scope="{hover}">
             <v-layout class="black--text body-1" align-center row wrap>
               <v-flex xs4 px-2 class="font-weight-bold">{{user.username}}</v-flex>
               <v-flex xs4 px-2 class="text-truncate">{{user.name}}</v-flex>
               <v-flex xs4 px-2 class="text-truncate">{{user.email}}</v-flex>
               <v-expand-x-transition>
                 <div v-if="hover" class="options--reveal primary">
-                  <v-btn flat icon dark>
+                  <v-btn flat icon dark :to="{name: 'admin-profile', params: {data: user}}">
                     <v-icon>create</v-icon>
                   </v-btn>
-                  <v-btn flat icon dark>
+                  <v-btn flat icon dark @click.stop="delDialog(user)">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </div>
@@ -47,59 +47,70 @@
       </template>
     </v-list>
 
-    <!-- </v-card>
-    <v-hover v-for="(user, index) in users" :key="index">
-      <v-card slot-scope="{ hover }" class="mx-auto" fill-height flat :to="{}">
-        <v-layout justify-end align-center pa-2 row wrap>
-          <v-flex xs4 px-2>{{user.username}}</v-flex>
-          <v-flex xs4 px-2>{{user.name}}</v-flex>
-          <v-flex xs4 px-2 class="text-truncate">{{user.address}}</v-flex>
-          <v-expand-x-transition>
-            <div v-if="hover" class="v-card--reveal d-flex orange display-1 white--text" xs12>
-              <v-btn flat icon>
-                <v-icon>star_border</v-icon>
-              </v-btn>
-              <v-btn flat icon>
-                <v-icon>settings</v-icon>
-              </v-btn>
-              <v-btn flat icon>
-                <v-icon>power</v-icon>
-              </v-btn>
-            </div>
-          </v-expand-x-transition>
-        </v-layout>
-        <v-divider v-if="index + 1 < users.length" :key="`divider-${index}`"></v-divider>
-    </v-card>-->
-    <!-- </v-hover> -->
+    <v-dialog v-model="dialog" max-width="300">
+      <v-card>
+        <v-card-title class="headline">Konfirmasi Penghapusan</v-card-title>
+        <v-card-text>Apakah anda yakin untuk menghapus data ini?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat="flat" @click="dialog = false">Tidak</v-btn>
+          <v-btn color="error" depressed dark @click="remove">Ya</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
-
 <script>
 export default {
   data() {
     return {
+      dialog: false,
       api_token: "",
       users: [],
-      user: {}
+      user: {},
+      headers: {
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem("api_token")}`
+        }
+      }
     };
   },
   created() {
-    this.$http
-      .get("users", {headers: {        
-        'Authorization' : `Bearer ${window.localStorage.getItem('api_token')}`
-      }})
-      .then(ress => {
-        this.users = ress.data.data;
-        console.log(this.users);
-      })
-      .catch(e => {
-        console.log("error data: ", e.response);
-      });
+    this.fetchData();
+  },
+  methods: {
+    fetchData() {
+      this.$http
+        .get("users", this.headers)
+        .then(ress => {
+          this.users = ress.data.data;
+          console.log(this.users);
+        })
+        .catch(e => {
+          console.log("error data: ", e.response);
+        });
+    },
+    delDialog(user){
+      this.user = user;
+      this.dialog = true;
+    },
+    remove() {
+      // console.log("del user", this.user.name)
+      this.$http
+        .delete(`user/${this.user.id}`, this.headers)
+        .then(ress => {
+          this.dialog = false;
+          this.fetchData();
+        })
+        .catch(e => {
+          console.log("error:", e.response);
+        });
+    }
   }
 };
 </script>
 
-<style>
+<style scoped>
 .options--reveal {
   align-items: center;
   position: absolute;

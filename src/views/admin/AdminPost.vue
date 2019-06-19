@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div class="admin-profile">
     <v-layout row wrap>
       <v-flex xs12 md2 class="text-xs-center pb-2">
         <v-hover>
@@ -19,9 +19,6 @@
             <v-icon size="130">person</v-icon>
           </v-avatar>
         </v-hover>
-        <p class="mt-1">
-          <v-chip dark :style="{ 'background-color': color}">{{position}}</v-chip>
-        </p>
       </v-flex>
 
       <v-flex xs12 md10>
@@ -30,7 +27,7 @@
             <v-container py-0>
               <v-layout wrap>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.username" label="Username" disabled="true"/>
+                  <v-text-field v-model="user.username" label="Username" disabled/>
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-text-field v-model="user.name" label="Nama Lengkap"/>
@@ -57,17 +54,8 @@
 </template>
 <script>
 export default {
-  computed: {
-    color() {
-      return this.user.role == 2 ? "#D4AF37" : "#000";
-    },
-    position() {
-      return this.user.role == 2 ? "Master Admin" : "Admin";
-    }
-  },
   created() {
-    this.user = this.$store.getters["user/user"];
-    console.log("user", this.user);
+  
   },
   data() {
     return {
