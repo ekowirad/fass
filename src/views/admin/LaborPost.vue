@@ -14,9 +14,11 @@
         </div>
       </v-flex>
 
-      <!-- LABOR FORM -->
+      <!-- 
+        ------------------------------------------ LABOR FORM ------------------------------------------------------- 
+      -->
       <v-flex xs12 md10>
-        <v-form>
+        <v-form ref="form" v-model="valid" lazy-validation>
           <v-card class="mb-5">
             <v-toolbar flat dense color="grey lighten-2">
               <v-toolbar-title class="font-weight-light subtitle">Informasi Personal</v-toolbar-title>
@@ -24,50 +26,122 @@
             <v-container py-0 grid-list-lg>
               <v-layout wrap>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.ktp_id" label="Nomor KTP"/>
+                  <v-text-field
+                    type="number"
+                    :rules="rIdNumber"
+                    v-model="labor.ktp_id"
+                    label="Nomor KTP"
+                  />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.name" label="Name"/>
+                  <v-text-field v-model="labor.name" :rules="rGeneral" label="Nama Lengkap"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-select :items="items" v-model="user.birth_place" label="Tempat Kelahiran"></v-select>
+                  <v-select
+                    :items="items"
+                    v-model="labor.birth_place"
+                    :rules="rSelection"
+                    label="Tempat Kelahiran"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.birth_date" label="Tanggal Kelahiran"/>
+                  <v-menu
+                    v-model="birth_picker"
+                    :close-on-content-click="false"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="labor.birth_date"
+                        :rules="rGeneral"
+                        label="Tanggal Kelahiran"
+                        prepend-icon="event"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="labor.birth_date"
+                      no-title
+                      @input="birth_picker = false"
+                    ></v-date-picker>
+                  </v-menu>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Status"></v-select>
+                  <v-select
+                    :items="marital_status"
+                    item-value="index"
+                    v-model="labor.marital_status"
+                    :rules="rSelection"
+                    label="Status"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Suku"></v-select>
+                  <v-select :items="items" v-model="labor.ethnic" :rules="rSelection" label="Suku"></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Pendidikan"></v-select>
+                  <v-select
+                    :items="educations"
+                    v-model="labor.education"
+                    :rules="rSelection"
+                    label="Pendidikan"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Agama"></v-select>
+                  <v-select
+                    :items="religions"
+                    v-model="labor.religion"
+                    :rules="rSelection"
+                    label="Agama"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field type="number" v-model="user.handphone" label="Nomor Handphone"/>
+                  <v-text-field
+                    :rules="rPhone"
+                    type="number"
+                    min="0"
+                    v-model="labor.handphone"
+                    label="Nomor Handphone"
+                  />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-radio-group v-model="radioGroup" row>
-                    <div class="subheading mr-2 grey--text text--darken-1">Jenis Kelamin:</div>
-                    <v-radio label="Perempuan" value="radio-1"></v-radio>
-                    <v-radio label="Laki-laki" value="radio-2"></v-radio>
+                  <v-radio-group v-model="labor.sex" :rules="rSelection" row>
+                    <!-- <div class="subheading mr-2 grey--text text--darken-1">Jenis Kelamin:</div> -->
+                    <v-radio label="Perempuan" color="primary" value="1"></v-radio>
+                    <v-radio label="Laki-laki" color="primary" value="2"></v-radio>
                   </v-radio-group>
                 </v-flex>
                 <v-flex xs12 md4>
-                  <v-select :items="items" v-model="user.birth_place" label="Provinsi"></v-select>
+                  <v-select
+                    :items="items"
+                    v-model="labor.province_id"
+                    :rules="rSelection"
+                    label="Provinsi"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md4>
-                  <v-select :items="items" v-model="user.birth_place" label="Kabupaten"></v-select>
+                  <v-select
+                    :items="items"
+                    v-model="labor.regency_id"
+                    :rules="rSelection"
+                    label="Kabupaten"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md4>
-                  <v-select :items="items" v-model="user.birth_place" label="Kecamatan"></v-select>
+                  <v-select
+                    :items="items"
+                    v-model="labor.district_id"
+                    :rules="rSelection"
+                    label="Kecamatan"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12>
-                  <v-textarea v-model="user.address" label="Alamat Asal"/>
+                  <v-textarea v-model="labor.address" :rules="rAddress" label="Alamat Asal"/>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -77,40 +151,64 @@
               <h3 class="subtitle mb-0 grey--text text--darken-1">Informasi Penunjang</h3>
               <v-layout wrap>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Nama Ayah"/>
+                  <v-text-field v-model="labor.father_name" :rules="rGeneral" label="Nama Ayah"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Pekerjaan Ayah"/>
+                  <v-text-field
+                    v-model="labor.father_job"
+                    :rules="rGeneral"
+                    label="Pekerjaan Ayah"
+                  />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Nama Ibu"/>
+                  <v-text-field v-model="labor.mother_name" :rules="rGeneral" label="Nama Ibu"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Pekerjaan Ibu"/>
+                  <v-text-field v-model="labor.mother_job" :rules="rGeneral" label="Pekerjaan Ibu"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Nama Kerabat"/>
+                  <v-text-field v-model="labor.fam_name" :rules="rGeneral" label="Nama Kerabat"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Nomor Handphone"/>
+                  <v-text-field
+                    :rules="rPhone"
+                    type="number"
+                    min="0"
+                    v-model="labor.fam_handphone"
+                    label="Nomor Handphone"
+                  />
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-text-field type="number" v-model="user.handphone" label="Tinggi Badan"/>
+                  <v-text-field
+                    type="number"
+                    suffix="Cm"
+                    :rules="rGeneral"
+                    v-model="labor.height"
+                    label="Tinggi Badan"
+                  />
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-text-field type="number" v-model="user.handphone" label="Berat Badan"/>
+                  <v-text-field
+                    type="number"
+                    suffix="Kg"
+                    :rules="rGeneral"
+                    v-model="labor.weight"
+                    label="Berat Badan"
+                  />
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Rambut"></v-select>
+                  <v-select :items="hairs" v-model="labor.hair" :rules="rSelection" label="Rambut"></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="user.birth_place" label="Kulit"></v-select>
+                  <v-select :items="skins" v-model="labor.skin" :rules="rSelection" label="Kulit"></v-select>
                 </v-flex>
               </v-layout>
             </v-container>
           </v-card>
 
-          <!-- INFORMASI PEKERJAAN -->
+          <!-- 
+        ------------------------------------------ INFORMASI PEKERJAAN ------------------------------------------------------- 
+          -->
           <v-card class="mb-5">
             <v-toolbar flat dense color="grey lighten-2">
               <v-toolbar-title class="font-weight-light subtitle">Informasi Pekerjaan</v-toolbar-title>
@@ -118,11 +216,17 @@
             <v-container py-0 grid-list-lg>
               <v-layout wrap align-center>
                 <v-flex xs12 md12>
-                  <v-select :items="items" v-model="user.birth_place" label="Mendaftar Sebagai"></v-select>
+                  <v-select
+                    :items="items"
+                    v-model="labor.job_id"
+                    :rules="rSelection"
+                    label="Mendaftar Sebagai"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md12>
                   <v-combobox
-                    v-model="chips"
+                    v-model="labor.skills"
+                    :rules="rComboBox"
                     :items="items"
                     label="Keahlian"
                     chips
@@ -131,83 +235,126 @@
                   ></v-combobox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="checkbox" label="Tidak Takut Anjing"></v-checkbox>
+                  <v-checkbox v-model="labor.dog_fear" label="Tidak Takut Anjing"></v-checkbox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="checkbox" label="Bahasa Inggris"></v-checkbox>
+                  <v-checkbox v-model="labor.speak_english" label="Bisa Bahasa Inggris"></v-checkbox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="isDorm" label="Tinggal di Asrama"></v-checkbox>
+                  <v-checkbox v-model="labor.dorm_stay" label="Tinggal di Asrama"></v-checkbox>
                 </v-flex>
-                <v-flex xs12 md12 v-if="!isDorm">
-                  <v-textarea v-model="user.address" label="Alamat Tinggal Sekarang"/>
+                <v-flex xs12 md12 v-if="!labor.dorm_stay">
+                  <v-textarea v-model="labor.skills" label="Alamat Tinggal Sekarang"/>
                 </v-flex>
 
                 <!-- Pengalaman Kerja -->
-                <v-flex xs12 lg12 md12>
-                  <h3 class="subtitle mb-0 grey--text text--darken-1">Pengalaman Kerja</h3>
-                </v-flex>
                 <v-flex grow>
-                  <v-text-field v-model="carrier.name" label="Pengalaman"/>
-                </v-flex>
-                <v-flex shrink>
-                  <v-text-field v-model="carrier.start" label="Tahun Mulai"/>
-                </v-flex>
-                <v-flex shrink>
-                  <v-text-field v-model="carrier.end" label="Tahun selesai"/>
-                </v-flex>
-                <v-flex shrink style="width: 70px">
-                  <v-btn icon color="success" @click="addCarrier(carrier)">
-                    <v-icon>add</v-icon>
-                  </v-btn>
-                </v-flex>
+                  <v-form ref="formCarrier">
+                    <v-layout wrap>
+                      <v-flex xs12 lg12 md12>
+                        <h3 class="subtitle mb-0 grey--text text--darken-1">Pengalaman Kerja</h3>
+                      </v-flex>
+                      <v-flex grow>
+                        <v-text-field :rules="rGeneral" v-model="carrier.name" label="Pengalaman"/>
+                      </v-flex>
+                      <v-flex shrink>
+                        <v-text-field
+                          type="number"
+                          :rules="rGeneral"
+                          min="0"
+                          v-model="carrier.start"
+                          label="Tahun Mulai"
+                        />
+                      </v-flex>
+                      <v-flex shrink>
+                        <v-text-field
+                          type="number"
+                          :rules="rGeneral"
+                          min="0"
+                          v-model="carrier.end"
+                          label="Tahun selesai"
+                        />
+                      </v-flex>
+                      <v-flex shrink style="width: 70px">
+                        <v-btn icon color="success" @click="addCarrier(carrier)">
+                          <v-icon>add</v-icon>
+                        </v-btn>
+                      </v-flex>
 
-                <v-flex grow>
-                  <v-list>
-                    <template v-for="(carrier, index) in carriers">
-                      <v-list-tile :key="index" style="margin-left: -16px; margin-right: -16px;">
-                        <v-layout row wrap align-center>
-                          <v-flex grow class="text-truncate" style="width:246px ">{{carrier.name}}</v-flex>
-                          <v-flex
-                            shrink
-                            style="width:182px;"
-                            class="text-xs-center"
-                          >{{carrier.start}}</v-flex>
-                          <v-flex shrink style="width:182px" class="text-xs-center">{{carrier.end}}</v-flex>
-                          <v-flex shrink style="width: 70px">
-                            <v-btn flat icon color="error" @click="popArray(index, carriers)">
-                              <v-icon>clear</v-icon>
-                            </v-btn>
-                          </v-flex>
-                        </v-layout>
-                      </v-list-tile>
-                      <v-divider :key="index"></v-divider>
-                    </template>
-                  </v-list>
+                      <v-flex xs12 lg12 md12>
+                        <v-list>
+                          <template v-for="(carrier, index) in carriers">
+                            <v-list-tile
+                              :key="index"
+                              style="margin-left: -16px; margin-right: -16px;"
+                            >
+                              <v-layout row wrap align-center>
+                                <v-flex
+                                  grow
+                                  class="text-truncate"
+                                  style="width:246px "
+                                >{{carrier.name}}</v-flex>
+                                <v-flex shrink style="width:182px;">{{carrier.start}}</v-flex>
+                                <v-flex shrink style="width:182px">{{carrier.end}}</v-flex>
+                                <v-flex shrink style="width: 70px">
+                                  <v-btn flat icon color="error" @click="popArray(index, carriers)">
+                                    <v-icon>clear</v-icon>
+                                  </v-btn>
+                                </v-flex>
+                              </v-layout>
+                            </v-list-tile>
+                            <v-divider :key="index"></v-divider>
+                          </template>
+                        </v-list>
+                      </v-flex>
+                    </v-layout>
+                  </v-form>
                 </v-flex>
                 <!-- End of Pengalaman Kerja -->
 
                 <v-flex xs12 md4>
-                  <v-text-field type="number" v-model="user.name" label="Gaji Bulanan"/>
+                  <v-currency-field
+                    label="Gaji Bulanan"
+                    v-bind="currency_config"
+                    prefix="Rp"
+                    v-model="labor.price_month"
+                  ></v-currency-field>
                 </v-flex>
                 <v-flex xs12 md4>
-                  <v-text-field type="number" v-model="user.name" label="Gaji Harian"/>
+                  <v-currency-field
+                    label="Gaji Harian"
+                    v-bind="currency_config"
+                    prefix="Rp"
+                    v-model="labor.price_day"
+                  ></v-currency-field>
                 </v-flex>
                 <v-flex xs12 md4>
-                  <v-text-field type="number" v-model="user.name" label="Gaji Jam"/>
+                  <v-currency-field
+                    label="Gaji Jam"
+                    v-bind="currency_config"
+                    prefix="Rp"
+                    v-model="labor.price_hour"
+                  ></v-currency-field>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field :readonly="read" v-model="user.handphone" label="Nama Refferal"/>
+                  <v-text-field v-model="labor.ref_name" label="Nama Refferal"/>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="user.handphone" label="Nomor Handphone"/>
+                  <v-text-field
+                    v-model="labor.ref_handphone"
+                    type="number"
+                    min="0"
+                    label="Nomor Handphone"
+                  />
                 </v-flex>
               </v-layout>
             </v-container>
           </v-card>
           <!-- END OF INFORMASI PEKERJAAN -->
 
-          <!-- FILE SYARAT DAN KETENTUAN -->
+          <!-- 
+        ------------------------------------------ BERKAS PERSYARATAN ------------------------------------------------------- 
+          -->
           <v-card class="mb-5">
             <v-toolbar flat dense color="grey lighten-2">
               <v-toolbar-title class="font-weight-light subtitle">Berkas Persyaratan</v-toolbar-title>
@@ -254,7 +401,7 @@
                       </v-card>
                     </v-flex>
                   </v-layout>
-                  <v-dialog v-model="detdialog"  max-width="650px" transition="dialog-transition">
+                  <v-dialog v-model="detdialog" max-width="650px" transition="dialog-transition">
                     <v-card>
                       <v-img :src="image" style="max-width:100%; max-height:100%;"></v-img>
                     </v-card>
@@ -264,7 +411,14 @@
             </v-container>
           </v-card>
 
-          <v-btn class="mx-0 font-weight-light" block depressed large color="success">Daftar</v-btn>
+          <v-btn
+            class="mx-0 font-weight-light"
+            block
+            depressed
+            large
+            @click="register"
+            color="success"
+          >Daftar</v-btn>
         </v-form>
       </v-flex>
     </v-layout>
@@ -274,30 +428,56 @@
 <script>
 export default {
   data: () => ({
+    currency_config: {
+      thousands: ".",
+      precision: 0,
+      masked: false
+    },
+    birth_picker: false,
     read: false,
     image: "",
     detdialog: false,
     deldialog: false,
-    user: {},
+    labor: {},
+    marital_status: ["Lajang", "Menikah", "Duda", "Janda"],
+    educations: ["Tidak Sekolah", "SD", "SMP", "SMA"],
+    religions: ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"],
+    hairs: ["Kriting", "Bergelombang", "Lurus"],
+    skins: ["Putih", "Kuning Langsat", "Sawo Matang", "Hitam"],
+
     carrier: {},
-    images: true,
-    carriers: [
-      {
-        name:
-          "lorem ipsum dsakjd sakdj askdjsa dksja dksajdksa dksajd sakjdksajd",
-        start: "2015",
-        end: "2019"
-      },
-      {
-        name: "Bekerja paruh waktu di perusahaan x",
-        start: "2015",
-        end: "2019"
-      }
-    ],
+    carriers: [],
     singleFile: "",
-    multiFiles: []
+    multiFiles: [],
+    // this error message use for special case like v-currency-field
+    field_require: {},
+    // Form Rules
+    valid: true,
+    rPhone: [
+      v => !!v || "Kolom ini tidak boleh kosong",
+      v => (v && v.length >= 9) || "Minimal 9 angka",
+      v => (v && v.length <= 12) || "Maksimal 12 angka"
+    ],
+    rComboBox: [v => v.length > 0 || "Kolom ini tidak boleh Kosong"],
+    rPrice: [v => !!v || "Kolom ini tidak boleh kosong"],
+    rIdNumber: [
+      v => !!v || "Kolom ini tidak boleh kosong",
+      v => (v && v.length <= 16) || "Maksimal 16 angka"
+    ],
+    rAddress: [
+      v => !!v || "Kolom ini tidak boleh kosong",
+      v => (v && v.length >= 12) || "Alamat teralu singkat"
+    ],
+    rSelection: [v => !!v || "Kolom ini tidak boleh kosong"],
+    rGeneral: [v => (!!v && v.trim() !== "") || "Kolom ini tidak boleh kosong"]
   }),
   methods: {
+    register() {
+      console.log("labor marital status: ", this.labor.marital_status)
+      if (this.$refs.form.validate()) {
+        consol.log("FORRRRMMMMM IS VALID");
+      }
+    },
     pickSingleFile() {
       this.$refs.singleFile.click();
     },
@@ -341,17 +521,11 @@ export default {
       array.splice(index, 1);
     },
     addCarrier(carrier) {
-      // create new obj
-      var newCarrier = {};
-      newCarrier.name = carrier.name;
-      newCarrier.start = carrier.start;
-      newCarrier.end = carrier.end;
-      // push new obj
-      this.carriers.push(newCarrier);
-
-      carrier.name = "";
-      carrier.start = "";
-      carrier.end = "";
+      if (this.$refs.formCarrier.validate()) {
+        this.carriers.push(carrier);
+        this.carrier = {};
+        this.$refs.formCarrier.resetValidation();
+      }
     },
     detImage(image) {
       this.image = image;
@@ -360,6 +534,10 @@ export default {
     delImage() {
       this.multiFiles.pop;
     }
+  },
+  created() {
+    this.labor.marital_status = 'Duda'
+
   }
 };
 </script>
