@@ -444,9 +444,19 @@
             </v-container>
           </v-card>
 
+          <v-alert
+            v-model="alert.show"
+            :color="alert.color"
+            :icon="alert.icon"
+            dismissible
+            outline
+          >{{alert.message}}</v-alert>
+          
           <v-btn
-            class="mx-0 font-weight-light"
+            class="mx-0 font-weight-light mt-3"
             block
+            :loading="loading"
+            :disabled="loading"
             depressed
             large
             @click="register"
@@ -461,6 +471,11 @@
 <script>
 export default {
   data: () => ({
+    alert: {
+      show: false
+    },
+    loading: false,
+    loader: null,
     currency_config: {
       thousands: ".",
       precision: 0,
@@ -555,9 +570,9 @@ export default {
   }),
   methods: {
     register() {
-      // this.postFile()
       if (this.$refs.form.validate()) {
         // set status to available
+        this.loading = true;
         this.labor.status = 1;
         this.$http
           .post("labor", this.labor, this.headers)
@@ -568,27 +583,45 @@ export default {
             this.postFile(ress.data.data.id);
             console.log(ress);
             this.resetForm();
+            this.alertCtrl('check_circle', 'success', 'Pekerja berhasil didaftarkan', true)
+            this.loading = false;
           })
           .catch(e => {
+            this.loading = false;
+            if(e.response.status == 500){
+              this.alertCtrl('warning', 'error', 'Mohon maaf terjadi kesalahan server', true)
+            }
             console.log("this error:", e.response);
           });
+      }else {
+        this.alertCtrl("priority_high", "warning", "Mohon lengkapi form pendaftaran", true)
       }
     },
+    alertCtrl(icon, color, msg, show){
+      this.alert.icon = icon
+      this.alert.color = color
+      this.alert.message = msg
+      this.alert.show = show
+    },
     resetForm() {
-      this.$refs.form.reset()
-      this.labor.price_month = 0
-      this.labor.price_day = 0
-      this.labor.price_hour = 0
-      this.singleFile = ""
-      this.multiFiles = []
-      this.carriers = []
+      this.$refs.form.reset();
+      this.labor.price_month = 0;
+      this.labor.price_day = 0;
+      this.labor.price_hour = 0;
+      this.singleFile = "";
+      this.multiFiles = [];
+      this.carriers = [];
     },
     postCarrier(labor_id) {
       this.$http
-        .post("carrier", {
-          labor_id: labor_id,
-          carriers: this.carriers
-        }, this.headers)
+        .post(
+          "carrier",
+          {
+            labor_id: labor_id,
+            carriers: this.carriers
+          },
+          this.headers
+        )
         .then(ress => {
           console.log(ress);
         })
@@ -671,6 +704,18 @@ export default {
       this.district = this.$store.getters["labor/districts"];
       this.regency = this.$store.getters["labor/regencies"];
       this.ethnics = this.$store.getters["labor/ethnics"];
+    }
+  },
+  watch: {
+    loader() {
+      console.log(this.loader);
+      console.log(this[this.loader]);
+      // const l = this.loader
+      // this[l] = !this[l]
+
+      // setTimeout(() => (this[l] = false), 3000)
+
+      // this.loader = null
     }
   },
   computed: {
