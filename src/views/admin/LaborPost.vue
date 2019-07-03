@@ -4,12 +4,12 @@
       <v-flex xs12 md2 class="text-xs-center">
         <div style="height:150px; width:150px; display: inline-block">
           <v-avatar size="150" color="grey lighten-2" style="overflow:hidden">
-            <img style="width:auto; border-radius:0" :src="singleFile" v-if="singleFile != ''" alt>
+            <img style="width:auto; border-radius:0" :src="singleFile" v-if="singleFile != ''" alt />
             <v-icon v-else size="130">person</v-icon>
           </v-avatar>
           <v-btn fab class="mb-3" style="right:20%; bottom:25%" small @click="pickSingleFile">
             <v-icon>add_photo_alternate</v-icon>
-            <input type="file" style="display:none" ref="singleFile" @change="onSingleFilePicked">
+            <input type="file" style="display:none" ref="singleFile" @change="onSingleFilePicked" />
           </v-btn>
         </div>
       </v-flex>
@@ -34,15 +34,15 @@
                   />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.name" :rules="rGeneral" label="Nama Lengkap"/>
+                  <v-text-field v-model="labor.name" :rules="rGeneral" label="Nama Lengkap" />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-select
-                    :items="items"
+                  <v-autocomplete
+                    :items="regency"
                     v-model="labor.birth_place"
                     :rules="rSelection"
                     label="Tempat Kelahiran"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-menu
@@ -74,20 +74,27 @@
                 </v-flex>
                 <v-flex xs12 md3>
                   <v-select
-                    :items="marital_status"
-                    item-value="index"
                     v-model="labor.marital_status"
+                    :items="marital_status"
+                    item-value="idx"
                     :rules="rSelection"
                     label="Status"
                   ></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="items" v-model="labor.ethnic" :rules="rSelection" label="Suku"></v-select>
+                  <v-select
+                    :items="ethnics"
+                    item-value="id"
+                    v-model="labor.ethnic_id"
+                    :rules="rSelection"
+                    label="Suku"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
                   <v-select
                     :items="educations"
                     v-model="labor.education"
+                    item-value="idx"
                     :rules="rSelection"
                     label="Pendidikan"
                   ></v-select>
@@ -96,6 +103,7 @@
                   <v-select
                     :items="religions"
                     v-model="labor.religion"
+                    item-value="idx"
                     :rules="rSelection"
                     label="Agama"
                   ></v-select>
@@ -118,7 +126,8 @@
                 </v-flex>
                 <v-flex xs12 md4>
                   <v-select
-                    :items="items"
+                    :items="provinces"
+                    item-value="id"
                     v-model="labor.province_id"
                     :rules="rSelection"
                     label="Provinsi"
@@ -126,7 +135,8 @@
                 </v-flex>
                 <v-flex xs12 md4>
                   <v-select
-                    :items="items"
+                    :items="regencies"
+                    item-value="id"
                     v-model="labor.regency_id"
                     :rules="rSelection"
                     label="Kabupaten"
@@ -134,14 +144,15 @@
                 </v-flex>
                 <v-flex xs12 md4>
                   <v-select
-                    :items="items"
+                    :items="districts"
+                    item-value="id"
                     v-model="labor.district_id"
                     :rules="rSelection"
                     label="Kecamatan"
                   ></v-select>
                 </v-flex>
                 <v-flex xs12>
-                  <v-textarea v-model="labor.address" :rules="rAddress" label="Alamat Asal"/>
+                  <v-textarea v-model="labor.address" :rules="rAddress" label="Alamat Asal" />
                 </v-flex>
               </v-layout>
             </v-container>
@@ -151,7 +162,7 @@
               <h3 class="subtitle mb-0 grey--text text--darken-1">Informasi Penunjang</h3>
               <v-layout wrap>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.father_name" :rules="rGeneral" label="Nama Ayah"/>
+                  <v-text-field v-model="labor.father_name" :rules="rGeneral" label="Nama Ayah" />
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-text-field
@@ -161,13 +172,13 @@
                   />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.mother_name" :rules="rGeneral" label="Nama Ibu"/>
+                  <v-text-field v-model="labor.mother_name" :rules="rGeneral" label="Nama Ibu" />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.mother_job" :rules="rGeneral" label="Pekerjaan Ibu"/>
+                  <v-text-field v-model="labor.mother_job" :rules="rGeneral" label="Pekerjaan Ibu" />
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.fam_name" :rules="rGeneral" label="Nama Kerabat"/>
+                  <v-text-field v-model="labor.fam_name" :rules="rGeneral" label="Nama Kerabat" />
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-text-field
@@ -197,10 +208,22 @@
                   />
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="hairs" v-model="labor.hair" :rules="rSelection" label="Rambut"></v-select>
+                  <v-select
+                    :items="hairs"
+                    v-model="labor.hair"
+                    item-value="idx"
+                    :rules="rSelection"
+                    label="Rambut"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-select :items="skins" v-model="labor.skin" :rules="rSelection" label="Kulit"></v-select>
+                  <v-select
+                    :items="skins"
+                    v-model="labor.skin"
+                    item-value="idx"
+                    :rules="rSelection"
+                    label="Kulit"
+                  ></v-select>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -217,7 +240,9 @@
               <v-layout wrap align-center>
                 <v-flex xs12 md12>
                   <v-select
-                    :items="items"
+                    :items="jobs"
+                    prepend-icon="assignment_ind"
+                    item-value="idx"
                     v-model="labor.job_id"
                     :rules="rSelection"
                     label="Mendaftar Sebagai"
@@ -227,7 +252,6 @@
                   <v-combobox
                     v-model="labor.skills"
                     :rules="rComboBox"
-                    :items="items"
                     label="Keahlian"
                     chips
                     clearable
@@ -235,16 +259,24 @@
                   ></v-combobox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="labor.dog_fear" label="Tidak Takut Anjing"></v-checkbox>
+                  <v-checkbox v-model="labor.dog_fear" color="primary" label="Tidak Takut Anjing"></v-checkbox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="labor.speak_english" label="Bisa Bahasa Inggris"></v-checkbox>
+                  <v-checkbox
+                    v-model="labor.speak_english"
+                    color="primary"
+                    label="Bisa Bahasa Inggris"
+                  ></v-checkbox>
                 </v-flex>
                 <v-flex xs12 md3>
-                  <v-checkbox v-model="labor.dorm_stay" label="Tinggal di Asrama"></v-checkbox>
+                  <v-checkbox v-model="labor.dorm_stay" color="primary" label="Tinggal di Asrama"></v-checkbox>
                 </v-flex>
                 <v-flex xs12 md12 v-if="!labor.dorm_stay">
-                  <v-textarea v-model="labor.skills" label="Alamat Tinggal Sekarang"/>
+                  <v-textarea
+                    v-model="labor.address_now"
+                    :rules="rAddress"
+                    label="Alamat Tinggal Sekarang"
+                  />
                 </v-flex>
 
                 <!-- Pengalaman Kerja -->
@@ -255,7 +287,7 @@
                         <h3 class="subtitle mb-0 grey--text text--darken-1">Pengalaman Kerja</h3>
                       </v-flex>
                       <v-flex grow>
-                        <v-text-field :rules="rGeneral" v-model="carrier.name" label="Pengalaman"/>
+                        <v-text-field :rules="rGeneral" v-model="carrier.name" label="Pengalaman" />
                       </v-flex>
                       <v-flex shrink>
                         <v-text-field
@@ -331,13 +363,14 @@
                 <v-flex xs12 md4>
                   <v-currency-field
                     label="Gaji Jam"
+                    required
                     v-bind="currency_config"
                     prefix="Rp"
                     v-model="labor.price_hour"
                   ></v-currency-field>
                 </v-flex>
                 <v-flex xs12 md6>
-                  <v-text-field v-model="labor.ref_name" label="Nama Refferal"/>
+                  <v-text-field v-model="labor.ref_name" label="Nama Refferal" />
                 </v-flex>
                 <v-flex xs12 md6>
                   <v-text-field
@@ -368,7 +401,7 @@
                     style="display:none"
                     ref="multiFile"
                     @change="onMultiFilePicked"
-                  >
+                  />
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -434,23 +467,59 @@ export default {
       masked: false
     },
     birth_picker: false,
-    read: false,
+    // for detail image in pop up modal
     image: "",
     detdialog: false,
-    deldialog: false,
     labor: {},
-    marital_status: ["Lajang", "Menikah", "Duda", "Janda"],
-    educations: ["Tidak Sekolah", "SD", "SMP", "SMA"],
-    religions: ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"],
-    hairs: ["Kriting", "Bergelombang", "Lurus"],
-    skins: ["Putih", "Kuning Langsat", "Sawo Matang", "Hitam"],
+    files: {},
 
+    // form data initiate
+    formData: new FormData(),
+    provinces: [],
+    regency: [],
+    district: [],
+    ethnics: [],
+    marital_status: [
+      { text: "Lajang", idx: 1 },
+      { text: "Menikah", idx: 2 },
+      { text: "Duda", idx: 3 },
+      { text: "Janda", idx: 4 }
+    ],
+    educations: [
+      { text: "Tidak Sekolah", idx: 1 },
+      { text: "SD", idx: 2 },
+      { text: "SMP", idx: 3 },
+      { text: "SMA", idx: 4 }
+    ],
+    religions: [
+      { text: "Islam", idx: 1 },
+      { text: "Kristen", idx: 2 },
+      { text: "Katolik", idx: 3 },
+      { text: "Hindu", idx: 4 },
+      { text: "Budha", idx: 5 },
+      { text: "Konghucu", idx: 6 }
+    ],
+    hairs: [
+      { text: "Kriting", idx: 1 },
+      { text: "Bergelombang", idx: 2 },
+      { text: "Lurus", idx: 3 }
+    ],
+    skins: [
+      { text: "Putih", idx: 1 },
+      { text: "Kuning Langsat", idx: 2 },
+      { text: "Sawo Matang", idx: 3 },
+      { text: "Hitam", idx: 4 }
+    ],
+    jobs: [
+      { text: "Pembantu Rumah Tanga", idx: 1 },
+      { text: "Pengasuh Bayi", idx: 2 },
+      { text: "Pengasuh Lansia", idx: 3 }
+    ],
     carrier: {},
     carriers: [],
     singleFile: "",
     multiFiles: [],
-    // this error message use for special case like v-currency-field
-    field_require: {},
+
     // Form Rules
     valid: true,
     rPhone: [
@@ -469,14 +538,74 @@ export default {
       v => (v && v.length >= 12) || "Alamat teralu singkat"
     ],
     rSelection: [v => !!v || "Kolom ini tidak boleh kosong"],
-    rGeneral: [v => (!!v && v.trim() !== "") || "Kolom ini tidak boleh kosong"]
+    rGeneral: [v => (!!v && v.trim() !== "") || "Kolom ini tidak boleh kosong"],
+
+    // header REST
+    multiFormHeader: {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${window.localStorage.getItem("api_token")}`
+      }
+    },
+    headers: {
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem("api_token")}`
+      }
+    }
   }),
   methods: {
     register() {
-      console.log("labor marital status: ", this.labor.marital_status)
+      // this.postFile()
       if (this.$refs.form.validate()) {
-        consol.log("FORRRRMMMMM IS VALID");
+        // set status to available
+        this.labor.status = 1;
+        this.$http
+          .post("labor", this.labor, this.headers)
+          .then(ress => {
+            if (this.carriers.length != 0) {
+              this.postCarrier(ress.data.data.id);
+            }
+            this.postFile(ress.data.data.id);
+            console.log(ress);
+            this.resetForm();
+          })
+          .catch(e => {
+            console.log("this error:", e.response);
+          });
       }
+    },
+    resetForm() {
+      this.$refs.form.reset()
+      this.labor.price_month = 0
+      this.labor.price_day = 0
+      this.labor.price_hour = 0
+      this.singleFile = ""
+      this.multiFiles = []
+      this.carriers = []
+    },
+    postCarrier(labor_id) {
+      this.$http
+        .post("carrier", {
+          labor_id: labor_id,
+          carriers: this.carriers
+        }, this.headers)
+        .then(ress => {
+          console.log(ress);
+        })
+        .catch(e => {
+          console.log("error upload carrier: ", e.response);
+        });
+    },
+    postFile(labor_id) {
+      this.formData.append("labor_id", labor_id);
+      this.$http
+        .post("files", this.formData, this.multiFormHeader)
+        .then(ress => {
+          console.log(ress);
+        })
+        .catch(e => {
+          console.log("error upload file: ", e.response);
+        });
     },
     pickSingleFile() {
       this.$refs.singleFile.click();
@@ -487,6 +616,7 @@ export default {
 
       if (files.length != 0) {
         if (/\.(jpe?g|png|gif|svg)$/i.test(files[0].name)) {
+          this.formData.append("profile_pic", files[0]);
           reader.readAsDataURL(files[0]);
           reader.addEventListener("load", () => {
             this.singleFile = reader.result;
@@ -503,6 +633,8 @@ export default {
       if (files.length != 0) {
         Array.from(files).forEach((file, idx) => {
           if (/\.(jpe?g|png|gif|svg)$/i.test(file.name)) {
+            // this.requirement_file.push(file)
+            this.formData.append("requirement_file[]", file);
             let reader = new FileReader();
             const getResult = new Promise(resolve => {
               reader.onload = e => {
@@ -514,7 +646,7 @@ export default {
           }
         });
       }
-      console.log("this multiple: ", this.multiFiles);
+      console.log("this multiple: ", this.formData);
     },
 
     popArray(index, array) {
@@ -533,11 +665,30 @@ export default {
     },
     delImage() {
       this.multiFiles.pop;
+    },
+    getDataLib() {
+      this.provinces = this.$store.getters["labor/provinces"];
+      this.district = this.$store.getters["labor/districts"];
+      this.regency = this.$store.getters["labor/regencies"];
+      this.ethnics = this.$store.getters["labor/ethnics"];
+    }
+  },
+  computed: {
+    regencies() {
+      let regencies = Array.from(this.regency).filter(
+        data => data.province_id == this.labor.province_id
+      );
+      return regencies;
+    },
+    districts() {
+      let districts = Array.from(this.district).filter(
+        data => data.regency_id == this.labor.regency_id
+      );
+      return districts;
     }
   },
   created() {
-    this.labor.marital_status = 'Duda'
-
+    this.getDataLib();
   }
 };
 </script>

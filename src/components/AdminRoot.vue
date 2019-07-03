@@ -13,7 +13,7 @@
       </v-navigation-drawer>
 
       <v-content>
-        <v-toolbar  flat style="background: transparent;">
+        <v-toolbar flat style="background: transparent;">
           <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
           <v-toolbar-title class="font-weight-light headline">
             Yayasan
@@ -118,14 +118,19 @@ export default {
         },
         {
           title: "Pengasuh Bayi",
-          icon: "question_answer",
+          icon: "child_friendly",
           route: "babysitter-list"
         },
         {
           title: "Pengasuh Lansia",
           icon: "question_answer",
           route: "caregiver-list"
-        }
+        },
+        {
+          title: "Pesanan",
+          icon: "assignment",
+          route: "caregiver-list"
+        },
       ]
     };
   }

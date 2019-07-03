@@ -65,6 +65,7 @@
 
 <script>
 import { mapMutations } from "vuex";
+import axios from 'axios'
 export default {
   data() {
     return {
@@ -75,12 +76,17 @@ export default {
       login: "",
       vLogin: [v => !!v || "Username / Email field required"],
       password: "",
-      vPassword: [v => !!v || "Password field required"]
+      vPassword: [v => !!v || "Password field required"],
+      apiUrl: ["provinces", "regencies", "districts", "ethnics"],
+      storeMutation: [
+        "labor/SET_PROVINCES",
+        "labor/SET_REGENCIES",
+        "labor/SET_DISTRICTS",
+        "labor/SET_ETHNICS",
+      ]
     };
   },
-  created(){
-    
-  },
+  created() {},
   methods: {
     attempt() {
       if (this.$refs.form.validate()) {
@@ -93,14 +99,14 @@ export default {
           })
           .then(ress => {
             this.$store.commit("user/SET_CURRENT_USER", ress.data);
-            window.localStorage.setItem('api_token', ress.data.api_token)
+            window.localStorage.setItem("api_token", ress.data.api_token);
+            this.getDataLib(ress.data.api_token)
             this.$router.push({ name: "dashboard" });
             this.user = this.loadShow = false;
           })
           .catch(e => {
             this.errShow = true;
             this.loadShow = false;
-            console.log(e);
             if (e.response.status == 401) {
               this.errMsg = "Cek kembali email, username, dan password";
             }
@@ -112,6 +118,27 @@ export default {
             // this.errMsg = e.response.
           });
       }
+    },
+    getDataLib(token){
+      axios.all([
+        this.dataLibReq(this.apiUrl[0], token),
+        this.dataLibReq(this.apiUrl[1], token),
+        this.dataLibReq(this.apiUrl[2], token),
+        this.dataLibReq(this.apiUrl[3], token)
+      ]).then(axios.spread((provinces, regencies, districts, ethnics) => {
+        this.$store.commit("labor/SET_PROVINCES", provinces.data);
+        this.$store.commit("labor/SET_REGENCIES", regencies.data);
+        this.$store.commit("labor/SET_DISTRICTS", districts.data);
+        this.$store.commit("labor/SET_ETHNICS", ethnics.data);
+      }))
+    },
+    dataLibReq(url, token){
+      return this.$http.get(`data_lib/${url}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
     }
   }
 };

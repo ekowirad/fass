@@ -23,7 +23,6 @@
 <script>
 export default {
   mounted(){
-    console.log('user', this.$store.getters['user/GET_USER']);
 
   },
   created(){
