@@ -8,7 +8,7 @@ import LaborBabysitter from '../views/admin/LaborBabysitter'
 import LaborList from '../views/admin/LaborList'
 import LaborCaregiver from '../views/admin/LaborCaregiver'
 import LaborPost from '../views/admin/LaborPost'
-
+import LaborEdit from '../views/admin/LaborEdit'
 
 const admin = [
     {
@@ -51,7 +51,12 @@ const admin = [
                 path: '',
                 name: 'prt-list',
                 component: LaborList,
-            }
+            },
+            {
+                path: ':data',
+                name: 'prt-edit',
+                component: LaborEdit,
+            },
         ],
 
     },
@@ -64,7 +69,13 @@ const admin = [
                 name: 'babysitter-list',
                 component: LaborList,
 
-            }
+            },
+            {
+                path: ':data',
+                name: 'babysitter-edit',
+                component: LaborEdit,
+            },
+
         ]
     },
     {
@@ -75,7 +86,12 @@ const admin = [
                 path: '',
                 name: 'caregiver-list',
                 component: LaborList,
-            }
+            },
+            {
+                path: ':data',
+                name: 'caregiver-edit',
+                component: LaborEdit,
+            },
         ],
 
     },
