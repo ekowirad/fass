@@ -73,17 +73,18 @@
                     </v-toolbar>
                     <v-list-tile v-if="order.labor != null">
                       <v-list-tile-content>
-                        <v-list-tile-title class="text-xs-right">{{order.labor.name}}</v-list-tile-title>
+                        <v-list-tile-title class="text-xs-right green--text">{{order.labor.name}}</v-list-tile-title>
                         <v-list-tile-sub-title
-                          class="text-xs-right"
+                          class="text-xs-right green--text text--lighten-3"
                         >{{jobs[order.labor.job_id-1].text}}</v-list-tile-sub-title>
                       </v-list-tile-content>
+                    <v-list-tile-action>
+                      <v-icon color="success">perm_identity</v-icon>
+                    </v-list-tile-action>
                     </v-list-tile>
                     <v-list-tile v-else>
                       <v-spacer></v-spacer>
                       <v-chip color="orange" label outline>Prefensi pekerja terlampir</v-chip>
-                      <!-- <v-list-tile-title class="text-xs-right"> -->
-                      <!-- </v-list-tile-title> -->
                     </v-list-tile>
                   </v-list>
                 </v-card-text>
@@ -137,7 +138,7 @@ export default {
         });
     },
     dateOrder(date) {
-      return moment(date).format("DD-MM-YYYY");
+      return moment(date).format("DD/MMMM/YYYY");
     },
     detail(id, labor, order_labor) {
       console.log("id", id)

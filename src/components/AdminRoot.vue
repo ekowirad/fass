@@ -13,7 +13,7 @@
           <v-list-group  prepend-icon="account_box" >
             <template v-slot:activator>
               <v-list-tile>
-                <v-list-tile-title>Tenaga Kerja</v-list-tile-title>
+                <v-list-tile-title>Pekerja</v-list-tile-title>
               </v-list-tile>
             </template>
             <v-list-tile v-for="item in labors" :key="item.title" route :to="{name: item.route}">
@@ -136,7 +136,7 @@ export default {
       ],
       labors: [
         {
-          title: "Tambah Pekerja",
+          title: "Registrasi",
           icon: "add_box",
           route: "labor-post"
 
