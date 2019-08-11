@@ -2,9 +2,14 @@
   <div class="labor-post mt-4">
     <v-layout row wrap>
       <v-flex xs12 md2 class="text-xs-center">
-        <div style="height:150px; width:150px; display: inline-block">
-          <v-avatar size="150" color="grey lighten-2" style="overflow:hidden">
-            <img style="width:auto; border-radius:0" :src="singleFile" v-if="singleFile != ''" alt />
+        <div style="height:150px; width:150px; display: inline-block;">
+          <v-avatar size="150" class="grey lighten-2" style="overflow:hidden; ">
+            <img
+              style="width:auto; border-radius:0"
+              :src="labor.profile_pic.url"
+              v-if="labor.profile_pic != null"
+              alt
+            />
             <v-icon v-else size="130">person</v-icon>
           </v-avatar>
           <v-btn fab class="mb-3" style="right:20%; bottom:25%" small @click="pickSingleFile">
@@ -19,9 +24,21 @@
       -->
       <v-flex xs12 md10>
         <v-form ref="form" v-model="valid" lazy-validation>
+          <!-- Status layout -->
+          <v-toolbar dark class="mb-2" flat dense :color="status_color[labor.status]">
+            <v-toolbar-title class="subheading">Status</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
+            <v-select :items="status" item-value="idx" v-model="labor.status"></v-select>
+          </v-toolbar>
+
           <v-card class="mb-5">
             <v-toolbar flat dense color="grey lighten-2">
-              <v-toolbar-title class="font-weight-light subtitle">Informasi Personal</v-toolbar-title>
+              <v-toolbar-title class="font-weight-light subtitle">Informasi Pribadi</v-toolbar-title>
             </v-toolbar>
             <v-container py-0 grid-list-lg>
               <v-layout wrap>
@@ -229,7 +246,6 @@
             </v-container>
           </v-card>
 
-
           <!-- 
         ------------------------------------------ INFORMASI PEKERJAAN ------------------------------------------------------- 
           -->
@@ -239,7 +255,10 @@
             </v-toolbar>
             <v-container py-0 grid-list-lg>
               <v-layout wrap align-center>
-                <v-flex xs12 md12>
+                <v-flex xs12 md4>
+                  <v-text-field readonly v-model="labor.register_id" label="Nomor Registrasi" />
+                </v-flex>
+                <v-flex xs12 md8>
                   <v-select
                     :items="jobs"
                     prepend-icon="assignment_ind"
@@ -330,7 +349,12 @@
                                 <v-flex shrink style="width:182px;">{{carrier.start}}</v-flex>
                                 <v-flex shrink style="width:182px">{{carrier.end}}</v-flex>
                                 <v-flex shrink style="width: 70px">
-                                  <v-btn flat icon color="error" @click="popArray(index, carriers)">
+                                  <v-btn
+                                    flat
+                                    icon
+                                    color="error"
+                                    @click="delCarrier(carrier.id, index)"
+                                  >
                                     <v-icon>clear</v-icon>
                                   </v-btn>
                                 </v-flex>
@@ -409,13 +433,13 @@
 
             <v-container py-0 grid-list-lg>
               <v-layout wrap align-center>
-                <v-flex grow class="text-xs-center pa-5" v-if="multiFiles.length == 0">
+                <v-flex grow class="text-xs-center pa-5" v-if="labor.requirement_file.length == 0">
                   <v-icon size="120">collections</v-icon>
                   <div class="subheader">*Mohon unggah berkas dalam bentuk foto</div>
                 </v-flex>
                 <v-flex v-else grow>
                   <v-layout row wrap>
-                    <v-flex md3 v-for="(image, index) in multiFiles" :key="index">
+                    <v-flex md3 v-for="(image, index) in labor.requirement_file" :key="index">
                       <v-card flat tile class="d-flex">
                         <v-img :src="image.url" aspect-ratio="1">
                           <v-btn
@@ -424,7 +448,7 @@
                             color="error"
                             absolute
                             style="right:0"
-                            @click="popArray(index, multiFiles)"
+                            @click="delFile(image.id)"
                           >
                             <v-icon>clear</v-icon>
                           </v-btn>
@@ -452,7 +476,7 @@
             dismissible
             outline
           >{{alert.message}}</v-alert>
-          
+
           <v-btn
             class="mx-0 font-weight-light mt-3"
             block
@@ -462,7 +486,7 @@
             large
             @click="register"
             color="success"
-          >Daftar</v-btn>
+          >Ubah</v-btn>
         </v-form>
       </v-flex>
     </v-layout>
@@ -495,6 +519,13 @@ export default {
     regency: [],
     district: [],
     ethnics: [],
+    status: [
+      { text: "Tidak diketahui", idx: 0 },
+      { text: "Tersedia", idx: 1 },
+      { text: "Sedang Bekerja", idx: 2 },
+      { text: "Tidak aktif", idx: 3 }
+    ],
+    status_color: ["primary", "success", "warning", "error"],
     marital_status: [
       { text: "Lajang", idx: 1 },
       { text: "Menikah", idx: 2 },
@@ -570,49 +601,60 @@ export default {
     }
   }),
   methods: {
+    // LABOR METHOD -----------------------------------------------------
+    getLabor(id) {
+      this.$http
+        .get(`labor/${id}`, this.headers)
+        .then(ress => {
+          console.log(ress.data);
+          this.labor = ress.data;
+          this.labor.sex = this.labor.sex.toString();
+          console.log(this.labor);
+        })
+        .catch(e => {
+          console.log(e.response);
+        });
+    },
     register() {
       if (this.$refs.form.validate()) {
         // set status to available
         this.loading = true;
-        this.labor.status = 1;
         this.$http
-          .post("labor", this.labor, this.headers)
+          .put("labor", this.labor, this.headers)
           .then(ress => {
-            if (this.carriers.length != 0) {
-              this.postCarrier(ress.data.data.id);
-            }
-            this.postFile(ress.data.data.id);
-            console.log(ress);
+            this.getLabor(this.labor.id)
             this.resetForm();
-            this.alertCtrl('check_circle', 'success', 'Pekerja berhasil didaftarkan', true)
+            this.alertCtrl(
+              "check_circle",
+              "success",
+              "Pekerja berhasil dirubah",
+              true
+            );
             this.loading = false;
           })
           .catch(e => {
             this.loading = false;
-            if(e.response.status == 500){
-              this.alertCtrl('warning', 'error', 'Mohon maaf terjadi kesalahan server', true)
+            if (e.response.status == 500) {
+              this.alertCtrl(
+                "warning",
+                "error",
+                "Mohon maaf terjadi kesalahan server",
+                true
+              );
             }
             console.log("this error:", e.response);
           });
-      }else {
-        this.alertCtrl("priority_high", "warning", "Mohon lengkapi form pendaftaran", true)
+      } else {
+        this.alertCtrl(
+          "priority_high",
+          "warning",
+          "Mohon lengkapi form pendaftaran",
+          true
+        );
       }
     },
-    alertCtrl(icon, color, msg, show){
-      this.alert.icon = icon
-      this.alert.color = color
-      this.alert.message = msg
-      this.alert.show = show
-    },
-    resetForm() {
-      this.$refs.form.reset();
-      this.labor.price_month = 0;
-      this.labor.price_day = 0;
-      this.labor.price_hour = 0;
-      this.singleFile = "";
-      this.multiFiles = [];
-      this.carriers = [];
-    },
+
+    // CARRIER METHOD ------------------------------------------------------------
     postCarrier(labor_id) {
       this.$http
         .post(
@@ -624,36 +666,82 @@ export default {
           this.headers
         )
         .then(ress => {
-          console.log(ress);
+          console.log(ress.data)
+          Array.from(ress.data).forEach(value => {
+            this.labor.carriers.push(value);
+          });
         })
         .catch(e => {
           console.log("error upload carrier: ", e.response);
         });
     },
+    delCarrier(id, idx){
+      this.$http.put("carrier", {carrier_id: id}, this.headers)
+      .then(ress => {this.popArray(idx, this.labor.carriers)})
+      .catch(e => {console.log(e.response)})
+
+    },
+    addCarrier(carrier) {
+      if (this.$refs.formCarrier.validate()) {
+        this.carriers.push(carrier);
+        this.postCarrier(this.labor.id);
+        this.carrier = {};
+        this.$refs.formCarrier.resetValidation();
+      }
+    },
+
+    // FILE METHOD ----------------------------------------------------
     postFile(labor_id) {
       this.formData.append("labor_id", labor_id);
       this.$http
         .post("files", this.formData, this.multiFormHeader)
         .then(ress => {
-          console.log(ress);
+          console.log(ress)
+          this.getLabor(this.labor.id);
         })
         .catch(e => {
           console.log("error upload file: ", e.response);
         });
     },
+    delFile(id) {
+      this.$http
+        .delete(`files/${id}`, this.headers)
+        .then(ress => {
+          
+          this.getLabor(this.labor.id);
+        })
+        .catch(e => {
+          if (e.response.status == 500) {
+            this.alertCtrl(
+              "warning",
+              "error",
+              "Mohon maaf terjadi kesalahan server",
+              true
+            );
+          }
+        });
+    },
+    detImage(image) {
+      this.image = image;
+      this.detdialog = true;
+    },
+
+    // PICK FILES METHOD ----------------------------------------------------
+    // single files pick -----------------------------------
     pickSingleFile() {
       this.$refs.singleFile.click();
     },
     onSingleFilePicked(e) {
-      const files = e.target.files;
+      const files = e.target.files || e.dataTransfer.files;
 
       if (files.length != 0) {
         if (/\.(jpe?g|png|gif|svg)$/i.test(files[0].name)) {
           this.formData.append("profile_pic", files[0]);
-          this.postFile(this.labor_id)
+          this.postFile(this.labor.id);
         }
       }
     },
+    // multi files pick -----------------------------------
     pickMultiFile() {
       this.$refs.multiFile.click();
     },
@@ -665,28 +753,14 @@ export default {
           if (/\.(jpe?g|png|gif|svg)$/i.test(file.name)) {
             // this.requirement_file.push(file)
             this.formData.append("requirement_file[]", file);
-            this.postFile(this.labor_id)
           }
         });
+        this.postFile(this.labor.id)
       }
     },
 
     popArray(index, array) {
       array.splice(index, 1);
-    },
-    addCarrier(carrier) {
-      if (this.$refs.formCarrier.validate()) {
-        this.carriers.push(carrier);
-        this.carrier = {};
-        this.$refs.formCarrier.resetValidation();
-      }
-    },
-    detImage(image) {
-      this.image = image;
-      this.detdialog = true;
-    },
-    delImage() {
-      this.multiFiles.pop;
     },
     getDataLib() {
       this.provinces = this.$store.getters["labor/provinces"];
@@ -694,31 +768,20 @@ export default {
       this.regency = this.$store.getters["labor/regencies"];
       this.ethnics = this.$store.getters["labor/ethnics"];
     },
-    getLabor(id){
-      this.$http.get(`labor/${id}`, this.headers)
-      .then(ress => {
-        console.log(ress.data)
-        this.labor = ress.data
-        this.labor.sex = this.labor.sex.toString()
-        this.multiFiles = this.labor.requirement_file
-      })
-      .catch(e => {
-        console.log(e.response)
-      })
+    alertCtrl(icon, color, msg, show) {
+      this.alert.icon = icon;
+      this.alert.color = color;
+      this.alert.message = msg;
+      this.alert.show = show;
     },
-    getSex(){
-    }
-  },
-  watch: {
-    loader() {
-      console.log(this.loader);
-      console.log(this[this.loader]);
-      // const l = this.loader
-      // this[l] = !this[l]
-
-      // setTimeout(() => (this[l] = false), 3000)
-
-      // this.loader = null
+    resetForm() {
+      this.$refs.form.reset();
+      this.labor.price_month = 0;
+      this.labor.price_day = 0;
+      this.labor.price_hour = 0;
+      this.singleFile = "";
+      this.multiFiles = [];
+      this.carriers = [];
     }
   },
   computed: {
@@ -737,7 +800,7 @@ export default {
   },
   created() {
     this.getDataLib();
-    this.getLabor(this.$route.params.data).data
+    this.getLabor(this.$route.params.data).data;
   }
 };
 </script>

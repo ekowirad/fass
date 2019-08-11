@@ -31,7 +31,7 @@
               <v-flex xs4 px-2 class="text-truncate">{{user.name}}</v-flex>
               <v-flex xs4 px-2 class="text-truncate">{{user.email}}</v-flex>
               <v-expand-x-transition>
-                <div v-if="hover" class="options--reveal primary">
+                <div v-if="hover" class="options--reveal black">
                   <v-btn flat icon dark :to="{name: 'admin-profile', params: {data: user}}">
                     <v-icon>create</v-icon>
                   </v-btn>

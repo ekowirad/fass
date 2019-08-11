@@ -5,6 +5,7 @@ import Root from '../components/Root'
 import AdminRoot from '../components/AdminRoot'
 import Login from '../components/Login'
 import admin from './admin'
+import guest from './guest'
 
 
 
@@ -14,9 +15,10 @@ const router = new VueRouter({
     mode: 'history',
     routes: [
         {
-            path: '/',
+            path: '',
             name: 'root',
             component: Root,
+            children: guest
         },
         {
             path: '/admin',

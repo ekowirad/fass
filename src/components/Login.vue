@@ -48,7 +48,7 @@
                             color="primary"
                           ></v-progress-circular>
                           <span v-show="errShow" class="caption red--text text--darken-1">{{errMsg}}</span>
-                          <v-btn block @click="attempt" color="success">Masuk</v-btn>
+                          <v-btn depressed block @click="attempt" color="success">Masuk</v-btn>
                         </v-flex>
                       </v-layout>
                     </v-footer>
@@ -65,7 +65,6 @@
 
 <script>
 import { mapMutations } from "vuex";
-import axios from 'axios'
 export default {
   data() {
     return {
@@ -77,13 +76,6 @@ export default {
       vLogin: [v => !!v || "Username / Email field required"],
       password: "",
       vPassword: [v => !!v || "Password field required"],
-      apiUrl: ["provinces", "regencies", "districts", "ethnics"],
-      storeMutation: [
-        "labor/SET_PROVINCES",
-        "labor/SET_REGENCIES",
-        "labor/SET_DISTRICTS",
-        "labor/SET_ETHNICS",
-      ]
     };
   },
   created() {},
@@ -100,7 +92,6 @@ export default {
           .then(ress => {
             this.$store.commit("user/SET_CURRENT_USER", ress.data);
             window.localStorage.setItem("api_token", ress.data.api_token);
-            this.getDataLib(ress.data.api_token)
             this.$router.push({ name: "dashboard" });
             this.user = this.loadShow = false;
           })
@@ -119,27 +110,6 @@ export default {
           });
       }
     },
-    getDataLib(token){
-      axios.all([
-        this.dataLibReq(this.apiUrl[0], token),
-        this.dataLibReq(this.apiUrl[1], token),
-        this.dataLibReq(this.apiUrl[2], token),
-        this.dataLibReq(this.apiUrl[3], token)
-      ]).then(axios.spread((provinces, regencies, districts, ethnics) => {
-        this.$store.commit("labor/SET_PROVINCES", provinces.data);
-        this.$store.commit("labor/SET_REGENCIES", regencies.data);
-        this.$store.commit("labor/SET_DISTRICTS", districts.data);
-        this.$store.commit("labor/SET_ETHNICS", ethnics.data);
-      }))
-    },
-    dataLibReq(url, token){
-      return this.$http.get(`data_lib/${url}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-    }
   }
 };
 </script>

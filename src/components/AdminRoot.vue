@@ -9,6 +9,20 @@
             </v-list-tile-action>
             <v-list-tile-title>{{item.title}}</v-list-tile-title>
           </v-list-tile>
+
+          <v-list-group  prepend-icon="account_box" >
+            <template v-slot:activator>
+              <v-list-tile>
+                <v-list-tile-title>Tenaga Kerja</v-list-tile-title>
+              </v-list-tile>
+            </template>
+            <v-list-tile v-for="item in labors" :key="item.title" route :to="{name: item.route}">
+               <v-list-tile-action>
+              <v-icon>{{item.icon}}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-title>{{item.title}}</v-list-tile-title>
+            </v-list-tile>
+          </v-list-group>
         </v-list>
       </v-navigation-drawer>
 
@@ -112,9 +126,20 @@ export default {
         { title: "Dashboard", icon: "dashboard", route: "dashboard" },
         { title: "Admin", icon: "supervisor_account", route: "admin-list" },
         {
-          title: "Pekerja Rumah Tangga",
-          icon: "question_answer",
-          route: "prt-list"
+          title: "Pesanan",
+          icon: "all_inbox",
+          route: "order-list"
+        },
+        { title: "Pemasukan dan Pengeluaran", icon: "swap_horiz", route: "income-expense" },
+        { title: "Laporan", icon: "assessment", route: "report" },
+        
+      ],
+      labors: [
+        {
+          title: "Tambah Pekerja",
+          icon: "add_box",
+          route: "labor-post"
+
         },
         {
           title: "Pengasuh Bayi",
@@ -123,14 +148,14 @@ export default {
         },
         {
           title: "Pengasuh Lansia",
-          icon: "question_answer",
+          icon: "accessible",
           route: "caregiver-list"
         },
         {
-          title: "Pesanan",
-          icon: "assignment",
-          route: "caregiver-list"
-        },
+          title: "Pekerja Rumah Tangga",
+          icon: "accessibility_new",
+          route: "prt-list"
+        }
       ]
     };
   }

@@ -1,21 +1,21 @@
 <template>
   <div class="labor-list">
-    <v-layout row wrap>
+    <!-- <v-layout row wrap>
       <v-flex xs12 text-xs-right>
         <v-btn depressed color="success" class="mb-2" :to="{name: 'labor-post'}">
           <v-icon left dark>add</v-icon>Pekerja Baru
         </v-btn>
       </v-flex>
-    </v-layout>
+    </v-layout> -->
     <LaborFilter></LaborFilter>
     <v-container grid-list-lg>
       <v-layout row wrap align-center>
-        <v-flex xs12 md3 v-for="(labor, index) in labors" :key="index">
+        <v-flex xs12 md3 v-for="(labor, index) in labors.data" :key="index">
           <template>
             <v-hover>
               <v-card slot-scope="{hover}" :class="`elevation-${hover ? 7 : 0}`">
                 <v-expand-transition>
-                  <v-toolbar v-if="hover" dense class="options--reveal primary">
+                  <v-toolbar v-if="hover" dense class="options--reveal black">
                     <v-spacer></v-spacer>
                     <v-btn flat icon dark @click="laborEdit(labor.id)">
                       <v-icon>create</v-icon>
@@ -26,7 +26,7 @@
                   </v-toolbar>
                 </v-expand-transition>
                 <v-responsive class="text-xs-center pt-2">
-                  <v-avatar size="100" color="grey lighten-2" style="overflow:hidden">
+                  <v-avatar size="100" class="grey lighten-2" style="overflow:hidden">
                     <img
                       style="width:auto; border-radius:0"
                       :src="labor.profile_pic.url"
@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import LaborFilter from "./LaborFilter";
+import LaborFilter from "./LaborFilter"
 export default {
   components: {
     LaborFilter
@@ -116,7 +116,7 @@ export default {
       this.$http
         .get(`labors/${id}`, this.headers)
         .then(ress => {
-          this.labors = ress.data.data;
+          this.labors = ress.data;
           console.log(this.labors);
         })
         .catch(e => {

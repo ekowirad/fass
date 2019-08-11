@@ -21,7 +21,7 @@
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card class="mb-5">
             <v-toolbar flat dense color="grey lighten-2">
-              <v-toolbar-title class="font-weight-light subtitle">Informasi Personal</v-toolbar-title>
+              <v-toolbar-title class="font-weight-light subtitle">Informasi Pribadi</v-toolbar-title>
             </v-toolbar>
             <v-container py-0 grid-list-lg>
               <v-layout wrap>

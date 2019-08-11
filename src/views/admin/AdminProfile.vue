@@ -2,25 +2,9 @@
   <div class="admin-profile">
     <v-layout row wrap>
       <v-flex xs12 md2 class="text-xs-center pb-2">
-        <v-hover>
-          <v-avatar slot-scope="{ hover }" size="150" color="grey lighten-2">
-            <v-fab-transition>
-              <v-btn
-                v-show="hover? true: false"
-                fab
-                class="mb-3"
-                absolute
-                small
-                bottom
-                left
-                @click="dialog = !dialog"
-              >
-                <v-icon>insert_photo</v-icon>
-              </v-btn>
-            </v-fab-transition>
+          <v-avatar  size="150" color="grey lighten-2">
             <v-icon size="130">person</v-icon>
           </v-avatar>
-        </v-hover>
         <p class="mt-1">
           <v-chip dark :style="{ 'background-color': color}">{{position}}</v-chip>
         </p>
