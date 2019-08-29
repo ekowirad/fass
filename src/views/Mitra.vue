@@ -37,10 +37,12 @@
         <v-select :items="religions" item-value="idx" v-model="search.religion" label="Agama"></v-select>
         <v-select :items="ethnics" item-value="id" v-model="search.ethnic_id" label="Etnik"></v-select>
         <v-range-slider
+          class="mt-4 mr-2"
           color="success"
           label="Umur"
           step="10"
-          thumb-label
+          ticks="always"
+          thumb-label="always"
           v-model="search.age"
           max="60"
         ></v-range-slider>
@@ -132,15 +134,17 @@
           </v-footer>
         </v-flex>
       </v-layout>
-      <v-layout fill-height row v-else>
+      <v-layout fill-height row wrap v-else>
         <v-flex xs12 class="text-xs-center">
-          <div class="title">
-            <v-icon left>search</v-icon>Maaf, pekerja yang anda inginkan tidak ditemukan
+          <div class="headline">
+            Maaf, pekerja yang anda inginkan tidak ditemukan
           </div>
           <div
-            class="subheading mt-3"
+            class="subheading"
           >Anda bisa mengirimkan spesifikasi pekerja yang anda cari tadi, dan kami akan bantu carikan</div>
-          <v-btn depressed @click="order()" color="success">Pesan Sekarang</v-btn>
+          <v-img class="my-4" :src="searchIlustrator" max-height="310" contain></v-img>
+          <v-btn depressed large @click="order()" color="success">Pesan Sekarang</v-btn>
+
         </v-flex>
       </v-layout>
     </v-container>
@@ -151,6 +155,7 @@
 export default {
   data() {
     return {
+      searchIlustrator: require("@/assets/search_mitras.svg"),
       currency_options: {
         thousands: ".",
         precision: 0,
@@ -204,7 +209,7 @@ export default {
   },
   methods: {
     order(){
-      this.$store.commit("labor/SET_ORDER_LABOR_REQ", this.search)
+      this.$store.commit("labor/SET_ORDER_MITRA", this.search)
       this.$router.push({name: 'mitra-order', params:{data: this.search}})
     },
     detail(id) {

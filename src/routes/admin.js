@@ -18,6 +18,7 @@ import OrderEdit from '../views/admin/OrderEdit'
 import IncomeExpense from '../views/admin/IncomeExpense'
 
 import Report from '../views/admin/Report'
+import ReportOrderDetail from '../views/admin/ReportOrderDetail'
 
 const admin = [
     {
@@ -79,6 +80,11 @@ const admin = [
         path: 'laporan',
         name: 'report',
         component: Report
+    },
+    {
+        path: 'laporan/pesanan/:data',
+        name: 'report-order-detail',
+        component: ReportOrderDetail
     },
 
     // LABOR ----------------------------------------------

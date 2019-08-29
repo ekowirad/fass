@@ -25,7 +25,7 @@
       <v-flex xs12 md10>
         <v-form ref="form" v-model="valid" lazy-validation>
           <!-- Status layout -->
-          <v-toolbar dark class="mb-2" flat dense :color="status_color[labor.status]">
+          <v-toolbar dark class="mb-2" flat dense :color="statusColor(labor.status)">
             <v-toolbar-title class="subheading">Status</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
@@ -33,7 +33,7 @@
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
-            <v-select :items="status" item-value="idx" v-model="labor.status"></v-select>
+            <v-select :items="statuses" item-value="id" v-model="labor.status"></v-select>
           </v-toolbar>
 
           <v-card class="mb-5">
@@ -519,13 +519,12 @@ export default {
     regency: [],
     district: [],
     ethnics: [],
-    status: [
-      { text: "Tidak diketahui", idx: 0 },
-      { text: "Tersedia", idx: 1 },
-      { text: "Sedang Bekerja", idx: 2 },
-      { text: "Tidak aktif", idx: 3 }
+    statuses: [],
+    status_color: [
+      { color: "success", id: 4 },
+      { color: "warning", id: 5 },
+      { color: "error", id: 6 }
     ],
-    status_color: ["primary", "success", "warning", "error"],
     marital_status: [
       { text: "Lajang", idx: 1 },
       { text: "Menikah", idx: 2 },
@@ -622,7 +621,7 @@ export default {
         this.$http
           .put("labor", this.labor, this.headers)
           .then(ress => {
-            this.getLabor(this.labor.id)
+            this.getLabor(this.labor.id);
             this.resetForm();
             this.alertCtrl(
               "check_circle",
@@ -666,7 +665,7 @@ export default {
           this.headers
         )
         .then(ress => {
-          console.log(ress.data)
+          console.log(ress.data);
           Array.from(ress.data).forEach(value => {
             this.labor.carriers.push(value);
           });
@@ -675,11 +674,15 @@ export default {
           console.log("error upload carrier: ", e.response);
         });
     },
-    delCarrier(id, idx){
-      this.$http.put("carrier", {carrier_id: id}, this.headers)
-      .then(ress => {this.popArray(idx, this.labor.carriers)})
-      .catch(e => {console.log(e.response)})
-
+    delCarrier(id, idx) {
+      this.$http
+        .put("carrier", { carrier_id: id }, this.headers)
+        .then(ress => {
+          this.popArray(idx, this.labor.carriers);
+        })
+        .catch(e => {
+          console.log(e.response);
+        });
     },
     addCarrier(carrier) {
       if (this.$refs.formCarrier.validate()) {
@@ -696,7 +699,7 @@ export default {
       this.$http
         .post("files", this.formData, this.multiFormHeader)
         .then(ress => {
-          console.log(ress)
+          console.log(ress);
           this.getLabor(this.labor.id);
         })
         .catch(e => {
@@ -707,7 +710,6 @@ export default {
       this.$http
         .delete(`files/${id}`, this.headers)
         .then(ress => {
-          
           this.getLabor(this.labor.id);
         })
         .catch(e => {
@@ -755,8 +757,14 @@ export default {
             this.formData.append("requirement_file[]", file);
           }
         });
-        this.postFile(this.labor.id)
+        this.postFile(this.labor.id);
       }
+    },
+    statusColor(id) {
+      const status = Array.from(this.status_color).find(data => data.id == id)
+        .color;
+      console.log("color", status);
+      return status;
     },
 
     popArray(index, array) {
@@ -767,6 +775,9 @@ export default {
       this.district = this.$store.getters["labor/districts"];
       this.regency = this.$store.getters["labor/regencies"];
       this.ethnics = this.$store.getters["labor/ethnics"];
+      this.statuses = Array.from(this.$store.getters["labor/statuses"]).filter(
+        data => data.type == 2
+      );
     },
     alertCtrl(icon, color, msg, show) {
       this.alert.icon = icon;

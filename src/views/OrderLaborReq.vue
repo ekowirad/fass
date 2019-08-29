@@ -155,10 +155,9 @@ export default {
     }
   },
   created() {
-    this.params = this.$store.getters["labor/orderLaborReq"];
+    this.labor = this.$route.name != "mitra-order" ?  this.$store.getters["labor/orderLaborReq"] : this.$store.getters["labor/orderMitra"]
     this.jobs = this.$store.getters["labor/jobs"];
     this.ethnics = this.$store.getters["labor/ethnics"];
-    this.labor = this.params;
     console.log("order labor req", this.labor);
   },
   mounted() {},

@@ -9,6 +9,9 @@ const labor = {
         statuses: [],
         orderLabor: {},
         orderLaborReq: {},
+        orderMitra: {},
+        revenue: {},
+        report: {}
     },
     mutations: {
         SET_PROVINCES: (state, provinces) => {
@@ -53,11 +56,20 @@ const labor = {
                 state.jobs[idx].id = data.id
             })
         },
+        SET_ORDER_MITRA:(state, params) =>{
+            state.orderMitra = params
+        },
         SET_ORDER_LABOR:(state, params) =>{
             state.orderLabor = params
         },
         SET_ORDER_LABOR_REQ:(state, params) =>{
             state.orderLaborReq = params
+        },
+        SET_REVENUE: (state, revenue) => {
+            state.revenue = revenue
+        },
+        SET_REPORT: (state, report) => {
+            state.report = report
         },
         RESET_STATE_ARR: (state, key) =>{
             state[key] = []
@@ -74,7 +86,10 @@ const labor = {
         jobs: state => state.jobs,
         statuses: state => state.statuses,
         orderLabor: state => state.orderLabor,
-        orderLaborReq: state => state.orderLaborReq
+        orderLaborReq: state => state.orderLaborReq,
+        orderMitra: state => state.orderMitra,
+        revenue: state => state.revenue,
+        report: state => state.report
     }
 }
 

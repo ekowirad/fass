@@ -1,7 +1,7 @@
 <template>
   <div class="income-expense">
     <v-container fluid grid-list-lg>
-      <v-layout row wrap >
+      <v-layout row wrap>
         <v-flex xs12>
           Tanggal:
           <span class="title">{{date}}</span>
@@ -44,12 +44,25 @@
         </v-flex>
         <v-flex xs6>
           <v-card flat tile>
-            <v-card-title class="title" primary-title> <v-icon left>call_received</v-icon>Pemasukan</v-card-title>
+            <v-card-title class="title" primary-title>
+              <v-icon left>call_received</v-icon>Pemasukan
+              <v-spacer></v-spacer>
+              <v-progress-circular
+                v-if="progress"
+                size="25"
+                indeterminate
+                width="2"
+                color="primary"
+              ></v-progress-circular>
+            </v-card-title>
             <v-card-text>
               <v-list>
                 <template v-for="(income, index) in incomes">
                   <v-list-tile :key="income.id">
-                    <v-list-tile-action-text class="body-1 font-weight-regular" style="width:350px">{{income.name}}</v-list-tile-action-text>
+                    <v-list-tile-action-text
+                      class="body-1 font-weight-regular"
+                      style="width:350px"
+                    >{{income.name}}</v-list-tile-action-text>
                     <v-list-tile-title
                       class="text-xs-right body-1"
                     >Rp. {{formatPrice(income.nominal)}}</v-list-tile-title>
@@ -62,12 +75,25 @@
         </v-flex>
         <v-flex xs6>
           <v-card flat tile>
-            <v-card-title class="title" primary-title><v-icon left>call_made</v-icon>Pengeluaran</v-card-title>
+            <v-card-title class="title" primary-title>
+              <v-icon left>call_made</v-icon>Pengeluaran
+              <v-spacer></v-spacer>
+              <v-progress-circular
+                v-if="progress"
+                size="25"
+                indeterminate
+                width="2"
+                color="primary"
+              ></v-progress-circular>
+            </v-card-title>
             <v-card-text>
               <v-list>
                 <template v-for="(expense, index) in expenses">
                   <v-list-tile :key="expense.id">
-                    <v-list-tile-action-text class="body-1 font-weight-regular" style="width:350px">{{expense.name}}</v-list-tile-action-text>
+                    <v-list-tile-action-text
+                      class="body-1 font-weight-regular"
+                      style="width:350px"
+                    >{{expense.name}}</v-list-tile-action-text>
                     <v-list-tile-title
                       class="text-xs-right body-1"
                     >Rp. {{formatPrice(expense.nominal)}}</v-list-tile-title>
@@ -75,7 +101,6 @@
                   <v-divider :key="index"></v-divider>
                 </template>
               </v-list>
-
             </v-card-text>
           </v-card>
         </v-flex>
@@ -85,11 +110,12 @@
 </template>
 
 <script>
-import moment from "moment"
-import axios from "axios"
+import moment from "moment";
+import axios from "axios";
 export default {
   data() {
     return {
+      progress: false,
       currency_options: {
         thousands: ".",
         precision: 0,
@@ -111,7 +137,7 @@ export default {
   },
   created() {
     this.date = moment().format("DD/MMMM/YYYY");
-    this.fetchIncomeExpense()
+    this.fetchIncomeExpense();
   },
   methods: {
     formatPrice(value) {
@@ -119,40 +145,46 @@ export default {
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     postData() {
+      // set error to nominal field
       this.fieldErr =
         this.data.nominal != 0 ? false : "Kolom ini tidak boleh kosong";
       if (this.$refs.form.validate() && this.data.nominal != 0) {
+        this.data.revenue_id = this.$store.getters["labor/revenue"].id;
         this.$http
-          .post("expense_income", this.data, this.headers)
+          .post("expense_income", this.data, { headers: this.headers })
           .then(ress => {
             console.log("ress", ress);
+            this.fetchIncomeExpense();
+            this.data = { nominal: 0 };
+            this.$refs.form.reset();
           })
           .catch(e => {
             console.log("error", e.response);
           });
-        this.data = { nominal: 0 };
-        this.$refs.form.reset();
       }
     },
-    fetchIncomeExpense(){
+    fetchIncomeExpense() {
+      this.progress = true;
       axios
-        .all([
-          this.fetchData(1),
-          this.fetchData(2)
-        ])
+        .all([this.fetchData(1), this.fetchData(2)])
         .then(
           axios.spread((expenses, incomes) => {
-            this.expenses = expenses.data
-            this.incomes = incomes.data
-
-            console.log('incomes', incomes)
+            this.expenses = expenses.data;
+            this.incomes = incomes.data;
+            this.progress = false;
+            console.log("incomes", incomes);
           })
-        );
+        )
+        .catch(e => {
+          console.log("income_expense err", e.response);
+            this.progress = false;
+        });
     },
     fetchData(type) {
-     return this.$http.get(`expense_income/${type}`, {
-        headers: this.headers
-      })
+      return this.$http.get(`expense_income/${type}`, {
+        headers: this.headers,
+        params: { revenue_id: this.$store.getters["labor/revenue"].id }
+      });
     }
   }
 };

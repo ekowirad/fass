@@ -571,9 +571,9 @@ export default {
   methods: {
     register() {
       if (this.$refs.form.validate()) {
-        // set status to available
         this.loading = true;
-        this.labor.status = 1;
+        // set status to 4 = available
+        this.labor.status = 4;
         this.$http
           .post("labor", this.labor, this.headers)
           .then(ress => {

@@ -1,14 +1,7 @@
 <template>
   <div class="labor-list">
-    <!-- <v-layout row wrap>
-      <v-flex xs12 text-xs-right>
-        <v-btn depressed color="success" class="mb-2" :to="{name: 'labor-post'}">
-          <v-icon left dark>add</v-icon>Pekerja Baru
-        </v-btn>
-      </v-flex>
-    </v-layout> -->
-    <LaborFilter></LaborFilter>
-    <v-container grid-list-lg>
+    <v-container fluid grid-list-lg>
+      <labor-filter @search-clicked="searchFilter"></labor-filter>
       <v-layout row wrap align-center>
         <v-flex xs12 md3 v-for="(labor, index) in labors.data" :key="index">
           <template>
@@ -20,7 +13,7 @@
                     <v-btn flat icon dark @click="laborEdit(labor.id)">
                       <v-icon>create</v-icon>
                     </v-btn>
-                    <v-btn flat icon dark @click.stop="delDialog(user)">
+                    <v-btn v-if="labor.work_history.length != 0" flat icon dark @click="showWorkHistory(labor.work_history)">
                       <v-icon>list_alt</v-icon>
                     </v-btn>
                   </v-toolbar>
@@ -75,46 +68,138 @@
           </template>
         </v-flex>
       </v-layout>
+      <v-footer style="background-color:transparent" class="mt-4 justify-center">
+        <v-pagination
+          :length="labors.meta.last_page"
+          @input="isSearch? searchLabor() : getLabor()"
+          v-model="page"
+        ></v-pagination>
+      </v-footer>
+
+      <!-- WORK HISTORY DIALOG -->
+      <v-dialog v-model="workHistoryDialog" scrollable max-width="750">
+        <v-card>
+          <v-card-title class="title">
+            <v-icon left>storage</v-icon>Rotasi Kerja
+            <v-spacer></v-spacer>
+            <v-btn flat small icon depressed @click="workHistoryDialog = false">
+              <v-icon>clear</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="height: 500px;">
+            <v-list two-line>
+              <template v-for="(history, index) in workHistory">
+                <v-list-tile
+                  :to="{name: 'report-order-detail', params: {data: history.id}}"
+                  :key="history.id"
+                >
+                  <v-list-tile-content class="pr-4">
+                    <v-list-tile-title>{{history.name}}</v-list-tile-title>
+                    <v-list-tile-sub-title>
+                      <v-icon class="mr-1" small>call</v-icon>
+                      {{history.handphone}}
+                    </v-list-tile-sub-title>
+                    <v-list-tile-sub-title>{{history.address}}</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-list-tile-action>
+                    <v-list-tile-action-text>{{dateFormat(history.updated_at)}}</v-list-tile-action-text>
+                    <v-chip
+                      dark
+                      label
+                      :color="colors[history.time_type-1].color"
+                    >{{timeTypes[history.time_type-1].text}}</v-chip>
+                  </v-list-tile-action>
+                </v-list-tile>
+                <v-divider v-if="index + 1 < workHistory.length" :key="index"></v-divider>
+              </template>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
 
 <script>
-import LaborFilter from "./LaborFilter"
+import LaborFilter from "./LaborFilter";
+import moment from "moment";
 export default {
+  name: "LaborList",
   components: {
     LaborFilter
   },
   data() {
     return {
+      workHistoryDialog: false,
+      workHistory: [],
+      colors: [
+        { id: 1, color: "blue" },
+        { id: 2, color: "lime" },
+        { id: 3, color: "dark_pink" }
+      ],
+      timeTypes: [
+        { text: "Per-Jam", id: "price_hour" },
+        { text: "Per-Hari", id: "price_day" },
+        { text: "Per-Bulan (Tetap)", id: "price_month" }
+      ],
       headers: {
         headers: {
           Authorization: `Bearer ${window.localStorage.getItem("api_token")}`
         }
       },
       labors: [],
+      labor_job: "",
       filter: false,
-      status: ["Tidak diketahui", "Tersedia", "Sedang Bekerja", "Tidak Aktif"],
-      status_color: ["primary", "success", "warning", "error"],
-      gender: ["Tidak diketahui", "Perempuan", "Laki-laki"]
+      status_color: [
+        { color: "success", id: 4 },
+        { color: "warning", id: 5 },
+        { color: "error", id: 6 }
+      ],
+      gender: ["Tidak diketahui", "Perempuan", "Laki-laki"],
+      page: 0,
+      search: {},
+      statuses: [],
+      isSearch: false
     };
   },
   created() {
     this.showLabor();
+    this.statuses = this.$store.getters["labor/statuses"];
   },
   methods: {
+    dateFormat(date) {
+      return moment(date).format("DD/MMMM/YYYY");
+    },
+    showWorkHistory(workHistory) {
+      this.workHistory = workHistory;
+      this.workHistoryDialog = true;
+    },
+    searchFilter(search) {
+      this.isSearch = true;
+      this.search = search;
+      console.log("search data", this.search);
+      this.searchLabor();
+    },
     statusColor(id) {
-      return this.status_color[id];
+      const status = Array.from(this.status_color).find(data => data.id == id)
+        .color;
+      console.log("color", status);
+      return status;
     },
     getStatus(status) {
-      return this.status[status];
+      return this.statuses.find(data => data.id == status).name;
     },
     getGender(id) {
       return this.gender[id];
     },
-    getLabor(id) {
+    getLabor() {
+      let url =
+        this.page == 0
+          ? `labors/${this.labor_job}`
+          : `labors/${this.labor_job}?page=${this.page}`;
       this.$http
-        .get(`labors/${id}`, this.headers)
+        .get(url, this.headers)
         .then(ress => {
           this.labors = ress.data;
           console.log(this.labors);
@@ -123,32 +208,44 @@ export default {
           console.log(e.response);
         });
     },
+    searchLabor() {
+      let url = this.page == 0 ? "search" : `search?page=${this.page}`;
+      this.$http
+        .post(url, this.search)
+        .then(ress => {
+          console.log(ress);
+          this.labors = ress.data;
+        })
+        .catch(e => {
+          console.log("search error", e.response);
+        });
+    },
     showLabor() {
       switch (this.$route.name) {
         case "prt-list":
-          this.getLabor(1);
+          this.labor_job = 1;
           break;
         case "babysitter-list":
-          this.getLabor(2);
+          this.labor_job = 2;
           break;
         case "caregiver-list":
-          this.getLabor(3);
+          this.labor_job = 3;
           break;
-
         default:
           break;
       }
+      this.getLabor();
     },
     laborEdit(id) {
       switch (this.$route.name) {
         case "prt-list":
-          this.$router.push({ name: "prt-edit", params: {data:id }});
+          this.$router.push({ name: "prt-edit", params: { data: id } });
           break;
         case "babysitter-list":
-          this.$router.push({ name: "babysitter-edit", params: {data:id }});
+          this.$router.push({ name: "babysitter-edit", params: { data: id } });
           break;
         case "caregiver-list":
-          this.$router.push({ name: "caregiver-edit", params: {data:id }});
+          this.$router.push({ name: "caregiver-edit", params: { data: id } });
           break;
 
         default:

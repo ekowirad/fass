@@ -136,7 +136,9 @@ export default {
               this.$store.commit("labor/SET_JOBS", jobs.data);
             }
           )
-        );
+        ).catch(e => {
+          console.log('catch data lib failed: ',e.reponse)
+        })
     },
     dataLibReq(url) {
       return this.$http.get(`data_lib/${url}`);

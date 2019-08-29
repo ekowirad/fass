@@ -50,17 +50,15 @@ router.beforeEach((to, from, next) => {
     }
 
     // prevent to login when user has login
-    // if(to.name === 'login'){
-    //     if(authUser !== null){
-    //        next({name: 'dashboard'}) 
-    //     }else {
-    //         next()
-    //     }
-    // }else{
-    //     next()
-    // }
-
-
+    if(to.name === 'login'){
+        if(authUser !== null){
+           next({name: 'dashboard'}) 
+        }else {
+            next()
+        }
+    }else{
+        next()
+    }
 })
 
 export default router;

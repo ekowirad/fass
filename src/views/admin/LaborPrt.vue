@@ -1,5 +1,5 @@
 <template>
-  <div class="prt2">
+  <div class="prt">
     <router-view :key="$route.path"></router-view>
   </div>
 </template>

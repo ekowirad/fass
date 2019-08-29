@@ -3,23 +3,26 @@
     <v-layout row wrap>
       <v-flex xs12 text-xs-right>
         <v-btn depressed color="success" class="mb-2" :to="{name: 'admin-post'}">
-          <v-icon left dark>add</v-icon>Admin Baru
+          Admin Baru
+          <v-icon right dark>add</v-icon>
         </v-btn>
       </v-flex>
     </v-layout>
 
-    <v-card>
-      <v-layout class="black--text body-2" align-center row wrap>
-        <v-flex xs4>
-          <v-btn flat class="text-xs-right">Username</v-btn>
-        </v-flex>
-        <v-flex xs4>
-          <v-btn flat>Nama</v-btn>
-        </v-flex>
-        <v-flex xs4>
-          <v-btn flat>Email</v-btn>
-        </v-flex>
-      </v-layout>
+    <v-card flat class="mb-2">
+      <v-card-text>
+        <v-layout class="black--text body-2" align-center row wrap>
+          <v-flex xs4 px-2>
+            <div class="subheading">Username</div>
+          </v-flex>
+          <v-flex xs4 px-2>
+            <div class="subheading">Nama</div>
+          </v-flex>
+          <v-flex xs4 px-2>
+            <div class="subheading">Email</div>
+           </v-flex>
+        </v-layout>
+      </v-card-text>
     </v-card>
 
     <v-list>
@@ -47,14 +50,19 @@
       </template>
     </v-list>
 
-    <v-dialog v-model="dialog" max-width="300">
+    <v-dialog v-model="dialog" max-width="500">
       <v-card>
-        <v-card-title class="headline">Konfirmasi Penghapusan</v-card-title>
-        <v-card-text>Apakah anda yakin untuk menghapus data ini?</v-card-text>
+        <v-card-title class="title error--text">
+          <v-icon color="error" left>warning</v-icon>Konfirmasi Penghapusan
+        </v-card-title>
+        <v-card-text
+          class="subheading"
+        >Anda tidak akan melihat lagi data ini. Apakah anda yakin untuk menghapus data ini?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat="flat" @click="dialog = false">Tidak</v-btn>
-          <v-btn color="error" depressed dark @click="remove">Ya</v-btn>
+          <v-progress-circular size="25" v-show="progress" indeterminate width="2" color="primary"></v-progress-circular>
+          <v-btn flat="flat" v-if="!progress" @click="dialog = false">Tidak</v-btn>
+          <v-btn color="error" v-if="!progress" depressed dark @click="remove">Ya</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -64,6 +72,7 @@
 export default {
   data() {
     return {
+      progress: false,
       dialog: false,
       api_token: "",
       users: [],
@@ -90,16 +99,17 @@ export default {
           console.log("error data: ", e.response);
         });
     },
-    delDialog(user){
+    delDialog(user) {
       this.user = user;
       this.dialog = true;
     },
     remove() {
-      // console.log("del user", this.user.name)
+      this.progress = true;
       this.$http
         .delete(`user/${this.user.id}`, this.headers)
         .then(ress => {
           this.dialog = false;
+          this.progress = false;
           this.fetchData();
         })
         .catch(e => {

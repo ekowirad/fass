@@ -249,7 +249,7 @@ export default {
     },
     order(){
       this.$router.push({name: 'mitra-order', params:{data:this.labor}})
-      this.$store.commit("labor/SET_ORDER_LABOR",this.labor)
+      this.$store.commit("labor/SET_ORDER_MITRA",this.labor)
     },
     fetchLabor(id) {
       this.$http

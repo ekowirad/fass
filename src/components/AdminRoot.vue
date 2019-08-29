@@ -10,17 +10,17 @@
             <v-list-tile-title>{{item.title}}</v-list-tile-title>
           </v-list-tile>
 
-          <v-list-group  prepend-icon="account_box" >
+          <v-list-group prepend-icon="account_box">
             <template v-slot:activator>
               <v-list-tile>
                 <v-list-tile-title>Pekerja</v-list-tile-title>
               </v-list-tile>
             </template>
             <v-list-tile v-for="item in labors" :key="item.title" route :to="{name: item.route}">
-               <v-list-tile-action>
-              <v-icon>{{item.icon}}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title>{{item.title}}</v-list-tile-title>
+              <v-list-tile-action>
+                <v-icon>{{item.icon}}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-title>{{item.title}}</v-list-tile-title>
             </v-list-tile>
           </v-list-group>
         </v-list>
@@ -108,8 +108,9 @@ export default {
       this.$http
         .post("logout")
         .then(ress => {
-          window.localStorage.clear();
-          this.$router.push({ name: "login" });
+          window.localStorage.clear()
+          this.$router.push({ name: "login" })
+          this.$store.commit("labor/RESET_STATE_OBJ", "revenue")
         })
         .catch(e => {
           console.log("error logout", e.response);
@@ -130,16 +131,18 @@ export default {
           icon: "all_inbox",
           route: "order-list"
         },
-        { title: "Pemasukan dan Pengeluaran", icon: "swap_horiz", route: "income-expense" },
-        { title: "Laporan", icon: "assessment", route: "report" },
-        
+        {
+          title: "Pemasukan dan Pengeluaran",
+          icon: "swap_horiz",
+          route: "income-expense"
+        },
+        { title: "Laporan", icon: "assessment", route: "report" }
       ],
       labors: [
         {
           title: "Registrasi",
           icon: "add_box",
           route: "labor-post"
-
         },
         {
           title: "Pengasuh Bayi",

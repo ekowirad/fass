@@ -59,25 +59,35 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
       labor: {},
       genders: [{ text: "Perempuan", idx: 1 }, { text: "Laki-laki", idx: 2 }],
       jobs: []
-    }
+    };
   },
-  created(){
-    this.labor = this.$store.getters['labor/orderLabor']
-    this.jobs = this.$store.getters['labor/jobs']
+  created() {
+    this.labor = this.$route.name != "mitra-order" ?  this.$store.getters["labor/orderLabor"] : this.$store.getters["labor/orderMitra"]
+    this.jobs = this.$store.getters["labor/jobs"];
 
-    console.log("this order labor", this.labor)
+    console.log("route name", this.$route.name);
+    this.$store.watch(
+      state => {
+        return this.$store.getters["labor/orderLabor"];
+      },
+      (newVal, oldVal) => {
+        this.labor = newVal;
+        console.log("old order labor", oldVal);
+        console.log("new order labor", newVal);
+      }
+    );
+    console.log("this order labor", this.labor);
   },
   methods: {
     formatPrice(value) {
       let val = (value / 1).toFixed(0).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
-
   }
 };
 </script>

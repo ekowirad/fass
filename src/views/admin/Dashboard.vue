@@ -3,85 +3,128 @@
     <v-container fluid grid-list-lg>
       <v-layout row wrap align-center>
         <v-flex xs12 class="mb-5">
-          <v-toolbar flat color="grey lighten-2">
-            <v-toolbar-title class="title font-weight-regular primary--text">
-              <v-icon left color="primary">assignment_late</v-icon>Pesanan yang belum selesai
+          <v-toolbar flat  color="grey lighten-2">
+            <v-toolbar-title class="title font-weight-regular">
+              <v-icon left color="orange">assignment_late</v-icon>Pesanan yang belum selesai
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn color="primary" outline flat>Lihat lebih banyak</v-btn>
+            <v-btn color="orange" outline flat :to="{name: 'order-list'}">Lihat lebih banyak</v-btn>
           </v-toolbar>
-          <v-layout wrap align-center v-if="orders.length != 0">
-            <v-flex xs3 v-for="order in orders" :key="order.id">
-              <v-card flat>
-                <v-list>
-                  <v-list-tile @click ripple>
-                    <v-list-tile-content>
-                      <v-list-tile-title class="body-2">{{formatDate(order.created_at)}}</v-list-tile-title>
-                    </v-list-tile-content>
-                    <v-list-tile-action>
-                      <v-icon>keyboard_arrow_right</v-icon>
-                    </v-list-tile-action>
-                  </v-list-tile>
-                  <v-divider></v-divider>
-                  <v-list-tile>
-                    <v-list-tile-content>
-                      <v-list-tile-title>{{order.name}}</v-list-tile-title>
-                      <v-list-tile-sub-title class="caption">
-                        <v-icon class="mr-1" small>call</v-icon>
-                        {{order.handphone}}
-                      </v-list-tile-sub-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile  v-if="order.labor !=null">
-                    <v-list-tile-action>
-                      <v-icon color="success">perm_identity</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title class="green--text">{{order.labor.name}}</v-list-tile-title>
-                      <v-list-tile-sub-title class="green--text text--lighten-3">{{jobs[order.labor.job_id-1].text}}</v-list-tile-sub-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile v-else>
-                    <v-list-tile-content>
-                      <v-chip color="orange" small label outline>Prefensi pekerja terlampir</v-chip>
-                    </v-list-tile-content>                    
-                  </v-list-tile>
-                </v-list>
+          <v-layout wrap row>
+            <v-flex xs12 v-show="progress">
+              <v-card flat color="transparent">
+                <v-card-text class="text-xs-center">
+                  <v-progress-circular indeterminate width="2" color="primary"></v-progress-circular>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex xs12 v-if="orders.length != 0">
+              <v-layout wrap align-center>
+                <v-flex xs3 v-for="order in orders.data" :key="order.id">
+                  <v-card flat>
+                    <v-list>
+                      <v-list-tile
+                        @click="orderDetail(order.id, order.labor, order.order_labor)"
+                        ripple
+                      >
+                        <v-list-tile-content>
+                          <v-list-tile-title class="body-2">{{formatDate(order.created_at)}}</v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-action>
+                            <v-icon>keyboard_arrow_right</v-icon>
+                        </v-list-tile-action>
+                      </v-list-tile>
+                      <v-divider></v-divider>
+                      <v-list-tile>
+                        <v-list-tile-content>
+                          <v-list-tile-title>{{order.name}}</v-list-tile-title>
+                          <v-list-tile-sub-title class="caption">
+                            <v-icon class="mr-1" small>call</v-icon>
+                            {{order.handphone}}
+                          </v-list-tile-sub-title>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile v-if="order.labor !=null">
+                        <v-list-tile-action>
+                          <v-icon color="success">perm_identity</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                          <v-list-tile-title class="green--text">{{order.labor.name}}</v-list-tile-title>
+                          <v-list-tile-sub-title
+                            class="green--text text--lighten-3"
+                          >{{jobs[order.labor.job_id-1].text}}</v-list-tile-sub-title>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile v-else>
+                        <v-list-tile-content>
+                          <v-chip color="orange" small label outline>Prefensi pekerja terlampir</v-chip>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                    </v-list>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+            <v-flex xs12 v-else-if="orders.length == 0 && !progress ">
+              <v-card flat color="transparent">
+                <v-card-text class="text-xs-center">
+                  <div class="title font-weight-regular">
+                    <v-icon left color="success">check_circle</v-icon>Semua pesanan telah terselesaikan
+                  </div>
+                </v-card-text>
               </v-card>
             </v-flex>
           </v-layout>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150">
+          <v-card tile flat height="150" dark color="#934CEF">
             <v-card-title class="subheading">
               <v-icon left>accessibility_new</v-icon>Pekerja Rumah Tangga
             </v-card-title>
-            <v-card-text class="display-3">{{prts.size}}</v-card-text>
+            <v-card-text class="display-2">
+              <div v-if="Object.entries(prts).length === 0">
+                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+              </div>
+              <div v-else>{{numberFormat(prts.size)}}</div>
+            </v-card-text>
           </v-card>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150">
+          <v-card tile flat height="150" dark color="#FFA726">
             <v-card-title class="subheading">
               <v-icon left>accessible</v-icon>Pengasuh Lansia
             </v-card-title>
-            <v-card-text class="display-3">{{caregivers.size}}</v-card-text>
+            <v-card-text class="display-2">
+              <div v-if="Object.entries(caregivers).length === 0">
+                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+              </div>
+              <div v-else>{{numberFormat(caregivers.size)}}</div>
+            </v-card-text>
           </v-card>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150">
+          <v-card tile flat height="150" dark color="#ED3072">
             <v-card-title class="subheading">
               <v-icon left>child_friendly</v-icon>Pengasuh Bayi
             </v-card-title>
-            <v-card-text class="display-3">{{babysitters.size}}</v-card-text>
+            <v-card-text class="display-2">
+              <div v-if="Object.entries(babysitters).length === 0">
+                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+              </div>
+              <div v-else>{{numberFormat(babysitters.size)}}</div>
+            </v-card-text>
           </v-card>
         </v-flex>
         <v-flex xs12>
           <v-toolbar flat color="grey lighten-2" class="mb-2">
-            <v-toolbar-title class="title font-weight-regular primary--text">
-              <v-icon left color="primary">how_to_reg</v-icon>Pekerja baru yang diregistrasi
+            <v-toolbar-title class="title font-weight-regular black--text">
+              <v-icon left color="success">how_to_reg</v-icon>Pekerja baru yang diregistrasi
             </v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn color="success" outline>Registrasi <v-icon right>add</v-icon></v-btn>
+            <v-btn color="success" outline :to="{name: 'labor-post'}">
+              Registrasi
+              <v-icon right>add</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-data-table :headers="labor_table_head" :items="labors.data" hide-actions>
             <template v-slot:items="props">
@@ -91,7 +134,7 @@
               <td class="text-xs-left">{{ props.item.age }}</td>
               <td class="text-xs-left">{{ jobs[props.item.job_id-1].text }}</td>
               <td class="text-xs-right">
-                <v-btn small icon flat>
+                <v-btn small icon flat @click="laborEdit(props.item.job_id, props.item.id)">
                   <v-icon>create</v-icon>
                 </v-btn>
               </td>
@@ -109,6 +152,7 @@ import moment from "moment";
 export default {
   data() {
     return {
+      progress: false,
       labors: {},
       labor_table_head: [
         { text: "Tanggal register", value: "register" },
@@ -131,6 +175,34 @@ export default {
     };
   },
   methods: {
+    numberFormat(num){
+    const max = 10000000
+    const sizeFinal = num.toString().substring(0,8).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1, ')
+    const maxFormated =max.toString().substring(0,8).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1, ')
+      return num > max? `${maxFormated}+` : sizeFinal
+    },
+    laborEdit(job_id, id) {
+      switch (job_id) {
+        case 1:
+          this.$router.push({ name: "prt-edit", params: { data: id } });
+          break;
+        case 2:
+          this.$router.push({ name: "babysitter-edit", params: { data: id } });
+          break;
+        case 3:
+          this.$router.push({ name: "caregiver-edit", params: { data: id } });
+          break;
+        default:
+          null;
+          break;
+      }
+    },
+    orderDetail(id, labor, order_labor) {
+      console.log("id", id);
+      this.$router.push({ name: "order-edit", params: { data: id } });
+      this.$store.commit("labor/SET_ORDER_LABOR", labor);
+      this.$store.commit("labor/SET_ORDER_LABOR_REQ", order_labor);
+    },
     formatDate(date) {
       return moment(date).format("DD/MMMM/YYYY");
     },
@@ -147,6 +219,7 @@ export default {
       return this.$http.get(`orders`, { headers: this.headers });
     },
     getLaborData() {
+      this.progress = true;
       axios
         .all([
           this.fetchOrder(),
@@ -162,9 +235,12 @@ export default {
             this.caregivers = caregivers.data;
             this.labors = allLabors.data;
             this.orders = orders.data;
+            this.progress = false;
             // console.log(dataorder);
           })
-        );
+        ).catch(e => {
+          this.progress =false
+        })
     }
   },
   mounted() {},

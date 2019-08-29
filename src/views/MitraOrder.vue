@@ -143,7 +143,7 @@
                     ></v-date-picker>
                   </v-menu>
                 </div>
-                <div v-if="params != null" class="text-xs-right mt-4">
+                <div v-if="labor.id != null" class="text-xs-right mt-4">
                   <div class="font-weight-medium">Total Harga:</div>
                   <div class="headline font-weight-bold">Rp. {{formatPrice(total)}}</div>
                   <div
@@ -160,9 +160,9 @@
           <v-card flat style="border-left: 2px solid #4CAF50;">
             <v-card-title class="title green--text" primary-title>
               <v-icon left color="success">check</v-icon>
-              {{params != null ? 'Mitra yang dipilih' : 'Spesifikasi mitra yang diinginkan'}}
+              {{labor.id != null ? 'Mitra yang dipilih' : 'Spesifikasi mitra yang diinginkan'}}
             </v-card-title>
-            <v-card-text v-if="params != null">
+            <v-card-text v-if="labor.id != null">
               <OrderLabor></OrderLabor>
             </v-card-text>
             <v-card-text v-else>
@@ -222,24 +222,21 @@ export default {
     };
   },
   created() {
-    this.params = this.$store.getters["labor/orderLabor"].id
+    this.labor = this.$store.getters["labor/orderMitra"]
+  
     console.log("mitra order", this.labor);
-    if (this.params != null) {
+    if (this.labor.id != null) {
       // if there is labor selected
-      this.labor = this.$store.getters["labor/orderLabor"];
       this.order.labor_id = this.labor.id;
     }else{
       // if there is no labor selected
-      this.order.order_labor = this.$store.getters["labor/orderLaborReq"]
+      this.order.order_labor = this.labor
     }
     this.jobs = this.$store.getters["labor/jobs"];
   },
   mounted() {},
   destroyed() {
-    this.$store.commit("labor/RESET_STATE_OBJ", 'orderLaborReq')
-    this.$store.commit("labor/RESET_STATE_OBJ", 'orderLabor')
-    // console.log('labor', this.$store.getters['labor/orderLabor'])
-    // console.log('labor req', this.$store.getters['labor/orderLaborReq'])
+    this.$store.commit("labor/RESET_STATE_OBJ", 'orderMitra')
   },
   computed: {
     subPrice: function() {

@@ -35,9 +35,6 @@
                     />
                     <v-footer color="white" absolute height="100">
                       <v-layout col wrap class="pa-3 mb-5">
-                        <!-- <v-flex xs12>
-                          <v-btn block @click="attempt" color="success">Masuk</v-btn>
-                        </v-flex>-->
                         <v-flex xs12>
                           <v-progress-circular
                             size="20"
@@ -92,8 +89,9 @@ export default {
           .then(ress => {
             this.$store.commit("user/SET_CURRENT_USER", ress.data);
             window.localStorage.setItem("api_token", ress.data.api_token);
-            this.$router.push({ name: "dashboard" });
+            this.$router.replace({ name: "dashboard" });
             this.user = this.loadShow = false;
+            this.createRevenue()
           })
           .catch(e => {
             this.errShow = true;
@@ -110,6 +108,18 @@ export default {
           });
       }
     },
+    createRevenue(){
+      let head = {Authorization: `Bearer ${window.localStorage.getItem("api_token")}`}
+      let data = { user_id: this.$store.getters["user/currentUser"].id }
+      this.$http.post("revenue", data, {headers: head})
+      .then(ress => {
+        console.log('ress', ress.data)
+        this.$store.commit("labor/SET_REVENUE", ress.data)
+      })
+      .catch(e => {
+        console.log('error', e.response)
+      })
+    }
   }
 };
 </script>

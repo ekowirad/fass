@@ -150,7 +150,13 @@
                     </v-list>
                   </v-card-text>
                 </v-card>
-                <v-btn @click="finishOrder" depressed block color="primary">Selesai</v-btn>
+                <v-btn
+                  @click="finishOrder"
+                  :loading="finishProgress"
+                  depressed
+                  block
+                  color="primary"
+                >Selesai</v-btn>
               </v-flex>
             </v-layout>
           </v-card>
@@ -233,7 +239,13 @@
             <v-card-text>
               <OrderLabor></OrderLabor>
             </v-card-text>
-            <v-btn @click="showSelectLabor" depressed block color="success">Ganti pekerja</v-btn>
+            <v-btn
+              @click="showSelectLabor"
+              :loading="progress"
+              depressed
+              block
+              color="success"
+            >Ganti pekerja</v-btn>
           </v-card>
           <v-card flat v-else>
             <v-card-title class="title green--text" primary-title>
@@ -245,50 +257,81 @@
             <v-btn
               @click="showSelectLabor"
               v-if="order.labor == null"
+              :loading="progress"
               depressed
               block
               color="success"
             >Pilih pekerja</v-btn>
           </v-card>
         </v-flex>
-
-        <v-dialog v-model="dialog" persistent scrollable max-width="500px">
-          <v-card>
-            <v-text-field @keydown.enter="searchLabor" class="mx-4" v-model="search.searchbox" placeholder="Cari nama atau id pekerja" append-icon="search"></v-text-field>
-            <v-card-text style="height: 300px;">
-              <v-list>
-                <template v-for="(labor, index) in labors.data">
-                  <v-list-tile @click="selectLabor(labor, index)" :key="index">
-                    <v-list-tile-action>
-                      <v-icon color="success" v-if="selected[index]">check</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title>{{labor.name}}</v-list-tile-title>
-                      <v-list-tile-sub-title>{{labor.register_id}}</v-list-tile-sub-title>
-                    </v-list-tile-content>
-                    <v-spacer></v-spacer>
-                    <v-chip small>{{jobs[labor.job_id-1].text}}</v-chip>
-                  </v-list-tile>
-                  <v-divider v-if="index + 1 < labors.data.length" :key="index"></v-divider>
-                </template>
-              </v-list>
-              <v-footer style="background-color:transparent" class="justify-center">
-                <v-pagination
-                  @input="isSearch? searchLabor() : fetchLabor()"
-                  :length="labors.meta.last_page"
-                  v-model="page"
-                ></v-pagination>
-              </v-footer>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" flat @click="dialog = false">Batal</v-btn>
-              <v-btn color="success" depressed @click="updateOrder">Pilih</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-layout>
+      <v-dialog v-model="dialog" persistent scrollable max-width="750">
+        <v-card>
+          <v-card-title class="title green--text">
+            Pekerja yang tersedia
+            <v-spacer></v-spacer>
+            <v-btn flat small icon depressed @click="dialog = false">
+              <v-icon>clear</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="height: 500px;">
+            <v-text-field
+              @keydown.enter="searchLabor"
+              v-model="search.searchbox"
+              placeholder="Cari nama atau id pekerja"
+              append-icon="search"
+            ></v-text-field>
+            <v-list v-if="labors.data.length != 0">
+              <template v-for="(labor, index) in labors.data">
+                <v-list-tile ripple @click="selectLabor(labor, index)" :key="index">
+                  <v-list-tile-action>
+                    <v-icon color="success" v-if="selected[index]">check</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{labor.name}}</v-list-tile-title>
+                    <v-list-tile-sub-title>{{labor.register_id}}</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-spacer></v-spacer>
+                  <v-chip small>{{jobs[labor.job_id-1].text}}</v-chip>
+                </v-list-tile>
+                <v-divider v-if="index + 1 < labors.data.length" :key="index"></v-divider>
+              </template>
+            </v-list>
+            <div class="subheading text-xs-center my-3 font-weight-medium" v-else>
+              <v-icon>search</v-icon>Tidak ada pekerja
+            </div>
+            <v-footer style="background-color:transparent" class="justify-center">
+              <v-pagination
+                @input="isSearch? searchLabor() : fetchLabor()"
+                :length="labors.meta.last_page"
+                :total-visible="7"
+                v-model="page"
+              ></v-pagination>
+            </v-footer>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="success" depressed @click="changeLabor">Pilih</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="dialogComplete" persistent max-width="500">
+        <v-card>
+          <v-card-title class="title green--text">
+            <v-icon color="success" left>check_circle</v-icon>Pesanan Selesai
+          </v-card-title>
+          <v-card-text
+            class="subheading"
+          >Pesanan telah selesai diproses dan telah dimasukan kedalam laporan hari ini.</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat depressed dark @click="confirm">Mengerti!</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -304,9 +347,13 @@ export default {
   },
   data() {
     return {
+      finishProgress: false,
+      progress: false,
+      dialogComplete: false,
       search: {},
       dialog: false,
       selected: [],
+      selectedLabor: {},
       page: 0,
       isSearch: false,
 
@@ -325,7 +372,7 @@ export default {
       order: {},
       date: "",
       jobs: [],
-      labors: [],
+      labors: {},
       colors: [
         { id: 1, color: "blue" },
         { id: 2, color: "lime" },
@@ -344,10 +391,11 @@ export default {
     };
   },
   methods: {
-    showSelectLabor(){
-      this.dialog = true
-      this.search = {}
-      this.fetchLabor()
+    showSelectLabor() {
+      this.dialog = true;
+      this.search = {};
+      this.selected = [];
+      this.fetchLabor();
     },
     selectLabor(labor, idx) {
       this.selected = Array(this.labors.data.length);
@@ -359,7 +407,9 @@ export default {
         this.selected.splice(idx, 1);
         this.selected.splice(idx, 1, !opt);
       }
-      this.order.labor_id = labor.id
+      this.selectedLabor = labor;
+      // this.order.labor = labor
+      // this.order.labor_id = labor.id;
     },
     pushAddonsCost(item) {
       this.cost.addons.push(item);
@@ -370,36 +420,103 @@ export default {
       array.splice(index, 1);
     },
     dateFormat(date) {
+      moment.locale("id");
       return moment(date).format("DD/MMMM/YYYY");
     },
     formatPrice(value) {
       let val = (value / 1).toFixed(0).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
-    finishOrder(){
-      this.order.addons_cost = this.cost.addons
-      this.order.salary_cut = this.cost.salary_cut
-      this.order.admin_cost = this.cost.admin_cost
-      this.order.total_cost = this.totalIncome
+    confirm() {
+      this.$router.replace({ name: "order-list" });
+      this.dialogComplete = false;
+    },
+    finishOrder() {
+      // set status order to 2 = Selesai
+      this.order.status_id = 2;
+      this.order.addons_cost = this.cost.addons;
+      this.order.salary_cut = this.cost.salary_cut;
+      this.order.admin_cost = this.cost.admin_cost;
+      this.order.total_cost = this.totalIncome;
+      this.order.revenue_id = this.$store.getters["labor/revenue"].id;
+      this.finishProgress = true;
 
-      console.log("order: ", this.order)
-      // this.updateOrder()
+      console.log("order: ", this.order);
+      this.updateOrder(2);
     },
     fetchOrder(id) {
       this.$http
         .get(`order/${id}`, this.headers)
         .then(ress => {
-          console.log(ress.data);
+          console.log("fetch order", ress.data);
           this.order = ress.data;
+          this.progress = false;
+          this.$store.commit("labor/SET_ORDER_LABOR", this.order.labor);
+          this.$store.commit(
+            "labor/SET_ORDER_LABOR_REQ",
+            this.order.order_labor
+          );
         })
         .catch(e => {
-          console.log(e.response);
+          this.progress = false;
+          console.log("fetch order err", e.response);
+        });
+    },
+    updateOrder(action) {
+      this.$http
+        .put("order", this.order, this.headers)
+        .then(ress => {
+          this.moderateUpdate(action);
+          console.log("update order", ress);
+        })
+        .catch(e => {
+          console.log("update order err", e.response);
+        });
+    },
+    moderateUpdate(action) {
+      switch (action) {
+        case 1:
+          // update labor only
+          this.fetchOrder(this.order.id);
+          break;
+        case 2:
+          // finish order
+          this.updateLabor(this.order.labor);
+          break;
+
+        default:
+          null;
+          break;
+      }
+    },
+    changeLabor() {
+      this.order.labor_id = this.selectedLabor.id;
+      this.dialog = false;
+      this.progress = true;
+      console.log("order data", this.order);
+      this.updateOrder(1);
+    },
+    updateLabor(labor) {
+      console.log("labor data", labor);
+      // set status 5 = sedang bekerja
+      labor.status = 5;
+      this.$http
+        .put("labor", labor, this.headers)
+        .then(ress => {
+          this.finishProgress = false;
+          this.dialogComplete = true;
+        })
+        .catch(e => {
+          this.finishProgress = false;
+          console.log("e update labor", e.response);
         });
     },
     fetchLabor() {
       let url = this.page == 0 ? "mitras" : `mitras?page=${this.page}`;
       this.$http
-        .get(url)
+        .get(url, {
+          params: { type: "available" }
+        })
         .then(ress => {
           this.labors = ress.data;
         })
@@ -409,26 +526,17 @@ export default {
     },
     searchLabor() {
       this.isSearch = true;
+      this.search.status = 4;
       console.log(this.search);
       let url = this.page == 0 ? "search" : `search?page=${this.page}`;
       this.$http
         .post(url, this.search)
         .then(ress => {
-          console.log("ress data", ress.data);
+          console.log("ress data", ress);
           this.labors = ress.data;
         })
         .catch(e => {
           console.log("search error", e.response);
-        });
-    },
-    updateOrder() {
-      this.$http
-        .put("order", this.headers)
-        .then(ress => {
-          this.labors = ress.data;
-        })
-        .catch(e => {
-          console.log(e.response);
         });
     }
   },
