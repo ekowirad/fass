@@ -11,7 +11,8 @@ const labor = {
         orderLaborReq: {},
         orderMitra: {},
         revenue: {},
-        report: {}
+        report: {},
+        workHistory: []
     },
     mutations: {
         SET_PROVINCES: (state, provinces) => {
@@ -71,6 +72,9 @@ const labor = {
         SET_REPORT: (state, report) => {
             state.report = report
         },
+        SET_WORK_HISTORY: (state, history) => {
+            state.workHistory = history
+        },
         RESET_STATE_ARR: (state, key) =>{
             state[key] = []
         },
@@ -89,7 +93,8 @@ const labor = {
         orderLaborReq: state => state.orderLaborReq,
         orderMitra: state => state.orderMitra,
         revenue: state => state.revenue,
-        report: state => state.report
+        report: state => state.report,
+        workHistory: state => state.workHistory
     }
 }
 

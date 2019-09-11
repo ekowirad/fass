@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <img id="img-bg" src="https://source.unsplash.com/daily">
+    <img id="img-bg" src="https://source.unsplash.com/daily" />
     <div id="img-bg1"></div>
     <v-app>
       <v-content>
@@ -62,6 +62,7 @@
 
 <script>
 import { mapMutations } from "vuex";
+import moment from "moment";
 export default {
   data() {
     return {
@@ -73,9 +74,23 @@ export default {
       vLogin: [v => !!v || "Username / Email field required"],
       password: "",
       vPassword: [v => !!v || "Password field required"],
+      apiUrl: [
+        "provinces",
+        "regencies",
+        "districts",
+        "ethnics",
+        "statuses",
+        "jobs"
+      ]
     };
   },
-  created() {},
+  created() {
+    if (this.$store.getters["labor/jobs"].length != 0) {
+      console.log("data lib has been filled, check vuex");
+    } else {
+      this.getDataLib();
+    }
+  },
   methods: {
     attempt() {
       if (this.$refs.form.validate()) {
@@ -91,7 +106,7 @@ export default {
             window.localStorage.setItem("api_token", ress.data.api_token);
             this.$router.replace({ name: "dashboard" });
             this.user = this.loadShow = false;
-            this.createRevenue()
+            this.checkRevenue();
           })
           .catch(e => {
             this.errShow = true;
@@ -108,17 +123,66 @@ export default {
           });
       }
     },
-    createRevenue(){
-      let head = {Authorization: `Bearer ${window.localStorage.getItem("api_token")}`}
-      let data = { user_id: this.$store.getters["user/currentUser"].id }
-      this.$http.post("revenue", data, {headers: head})
-      .then(ress => {
-        console.log('ress', ress.data)
-        this.$store.commit("labor/SET_REVENUE", ress.data)
-      })
-      .catch(e => {
-        console.log('error', e.response)
-      })
+    getDataLib() {
+      axios
+        .all([
+          this.dataLibReq(this.apiUrl[0]),
+          this.dataLibReq(this.apiUrl[1]),
+          this.dataLibReq(this.apiUrl[2]),
+          this.dataLibReq(this.apiUrl[3]),
+          this.dataLibReq(this.apiUrl[4]),
+          this.dataLibReq(this.apiUrl[5])
+        ])
+        .then(
+          axios.spread(
+            (provinces, regencies, districts, ethnics, statuses, jobs) => {
+              this.$store.commit("labor/SET_PROVINCES", provinces.data);
+              this.$store.commit("labor/SET_REGENCIES", regencies.data);
+              this.$store.commit("labor/SET_DISTRICTS", districts.data);
+              this.$store.commit("labor/SET_ETHNICS", ethnics.data);
+              this.$store.commit("labor/SET_STATUSES", statuses.data);
+              this.$store.commit("labor/SET_JOBS", jobs.data);
+            }
+          )
+        )
+        .catch(e => {
+          console.log("catch data lib failed: ", e.reponse);
+        });
+    },
+    dataLibReq(url) {
+      return this.$http.get(`data_lib/${url}`);
+    },
+    checkRevenue() {
+      if (Object.keys(this.$store.getters["labor/revenue"]).length === 0) {
+        console.log("kosssooong");
+        this.createRevenue();
+      } else {
+        console.log("heheheh");
+        let revenueDate = moment(
+          this.$store.getters["labor/revenue"].created_at
+        );
+        let date = moment().diff(revenueDate, "days");
+
+        // create revenue if date isn't now 
+        if (date != 0) {
+          this.createRevenue();
+        }
+      }
+    },
+    createRevenue() {
+      let head = {
+        Authorization: `Bearer ${window.localStorage.getItem("api_token")}`
+      };
+      let data = { user_id: this.$store.getters["user/currentUser"].id };
+      this.$http
+        .post("revenue", data, { headers: head })
+        .then(ress => {
+          console.log("ress", ress.data);
+          this.$store.commit("labor/SET_REVENUE", ress.data);
+        })
+        .catch(e => {
+          console.log("error", e.response);
+        });
     }
   }
 };

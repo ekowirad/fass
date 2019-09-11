@@ -137,7 +137,7 @@ export default {
       filter: {
         end_date: moment().format("YYYY-MM-DD"),
         start_date: moment()
-          .subtract(17, "d")
+          .subtract(7, "d")
           .format("YYYY-MM-DD")
       },
       menu: {

@@ -175,15 +175,73 @@
             <v-card-text>
               <OrderLabor></OrderLabor>
             </v-card-text>
+            <v-btn
+              @click="showSelectLabor"
+              :loading="progress"
+              depressed
+              block
+              color="success"
+            >Ganti pekerja</v-btn>
           </v-card>
         </v-flex>
       </v-layout>
+      <v-dialog v-model="dialog" persistent scrollable max-width="750">
+        <v-card>
+          <v-card-title class="title green--text">
+            Pekerja yang tersedia
+            <v-spacer></v-spacer>
+            <v-btn flat small icon depressed @click="dialog = false">
+              <v-icon>clear</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="height: 500px;">
+            <v-text-field
+              @keydown.enter="searchLabor"
+              v-model="search.searchbox"
+              placeholder="Cari nama atau id pekerja"
+              append-icon="search"
+            ></v-text-field>
+            <v-list v-if="labors.data.length != 0">
+              <template v-for="(labor, index) in labors.data">
+                <v-list-tile ripple @click="selectLabor(labor, index)" :key="index">
+                  <v-list-tile-action>
+                    <v-icon color="success" v-if="selected[index]">check</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    <v-list-tile-title>{{labor.name}}</v-list-tile-title>
+                    <v-list-tile-sub-title>{{labor.register_id}}</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-spacer></v-spacer>
+                  <v-chip small>{{jobs[labor.job_id-1].text}}</v-chip>
+                </v-list-tile>
+                <v-divider v-if="index + 1 < labors.data.length" :key="index"></v-divider>
+              </template>
+            </v-list>
+            <div class="subheading text-xs-center my-3 font-weight-medium" v-else>
+              <v-icon>search</v-icon>Tidak ada pekerja
+            </div>
+            <v-footer style="background-color:transparent" class="justify-center">
+              <v-pagination
+                @input="isSearch? searchLabor() : fetchLabor()"
+                :length="labors.meta.last_page"
+                :total-visible="7"
+                v-model="page"
+              ></v-pagination>
+            </v-footer>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="success" block depressed @click="changeLabor">Pilih</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
 
 <script>
 import moment from "moment";
+import axios from 'axios'
 import OrderLaborReq from "../OrderLaborReq";
 import OrderLabor from "../OrderLabor";
 export default {
@@ -245,6 +303,36 @@ export default {
       let val = (value / 1).toFixed(0).replace(".", ",");
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
+    showSelectLabor() {
+      this.dialog = true;
+      this.search = {};
+      this.selected = [];
+      this.fetchLabor();
+    },
+    selectLabor(labor, idx) {
+      this.selected = Array(this.labors.data.length);
+      const opt = true;
+      if (this.selected[idx] != opt) {
+        this.selected.splice(idx, 1);
+        this.selected.splice(idx, 1, opt);
+      } else {
+        this.selected.splice(idx, 1);
+        this.selected.splice(idx, 1, !opt);
+      }
+      this.selectedLabor = labor;
+      // this.order.labor = labor
+      // this.order.labor_id = labor.id;
+    },
+    updateOrder() {
+      this.$http
+        .put("order", this.order, this.headers)
+        .then(ress => {
+          this.multiUpdateLabor()
+        })
+        .catch(e => {
+          console.log("update order err", e.response);
+        });
+    },
     fetchOrder(id) {
       this.$http
         .get(`order/${id}`, this.headers)
@@ -263,6 +351,58 @@ export default {
           console.log("fetch order err", e.response);
         });
     },
+    changeLabor() {
+      this.order.labor_id = this.selectedLabor.id;
+      this.dialog = false;
+      this.progress = true;
+      console.log("order data", this.order);
+      this.updateOrder()
+    },
+    multiUpdateLabor(){
+      axios.all([
+        this.updateLabor(this.order.labor, 4),
+        this.updateLabor(this.selectedLabor, 5)
+      ]).then(axios.spread((prevLabor, selectedLabor) => {
+          this.fetchOrder(this.order.id)
+      })).catch(e => {
+        console.log('error update labor',e.response)
+
+      })
+
+    },
+    updateLabor(labor, status) {
+      labor.status = status
+      this.$http.put("labor", labor, this.headers)
+    },
+    fetchLabor() {
+      let url = this.page == 0 ? "mitras" : `mitras?page=${this.page}`;
+      this.$http
+        .get(url, {
+          params: { type: "available" }
+        })
+        .then(ress => {
+          this.labors = ress.data;
+        })
+        .catch(e => {
+          console.log(e.response);
+        });
+    },
+    searchLabor() {
+      this.isSearch = true;
+      // search labor on available status only
+      this.search.status = 4;
+      console.log(this.search);
+      let url = this.page == 0 ? "search" : `search?page=${this.page}`;
+      this.$http
+        .post(url, this.search)
+        .then(ress => {
+          console.log("ress data", ress);
+          this.labors = ress.data;
+        })
+        .catch(e => {
+          console.log("search error", e.response);
+        });
+    }
   },
   computed: {
     timeRange() {

@@ -77,39 +77,39 @@
           </v-layout>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150" dark color="#934CEF">
-            <v-card-title class="subheading">
-              <v-icon left>accessibility_new</v-icon>Pekerja Rumah Tangga
+          <v-card tile flat height="150" style="border-left: solid 2px #934CEF">
+            <v-card-title class="subheading prt--text ">
+              <v-icon left color="prt">accessibility_new</v-icon>Pekerja Rumah Tangga
             </v-card-title>
-            <v-card-text class="display-2">
+            <v-card-text class="display-2 prt--text">
               <div v-if="Object.entries(prts).length === 0">
-                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+                <v-progress-circular indeterminate width="2" v-show="progress" color="prt"></v-progress-circular>
               </div>
               <div v-else>{{numberFormat(prts.size)}}</div>
             </v-card-text>
           </v-card>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150" dark color="#FFA726">
-            <v-card-title class="subheading">
-              <v-icon left>accessible</v-icon>Pengasuh Lansia
+          <v-card tile flat height="150" style="border-left: solid 2px #FFA726">
+            <v-card-title class="subheading caregiver--text"  >
+              <v-icon left color="caregiver">accessible</v-icon>Pengasuh Lansia
             </v-card-title>
-            <v-card-text class="display-2">
+            <v-card-text class="display-2 caregiver--text">
               <div v-if="Object.entries(caregivers).length === 0">
-                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+                <v-progress-circular indeterminate width="2" v-show="progress" color="caregiver"></v-progress-circular>
               </div>
               <div v-else>{{numberFormat(caregivers.size)}}</div>
             </v-card-text>
           </v-card>
         </v-flex>
         <v-flex xs4>
-          <v-card tile flat height="150" dark color="#ED3072">
-            <v-card-title class="subheading">
-              <v-icon left>child_friendly</v-icon>Pengasuh Bayi
+          <v-card tile flat height="150" style="border-left: solid 2px #ED3072">
+            <v-card-title class="subheading babysitter--text" >
+              <v-icon left color="babysitter">child_friendly</v-icon>Pengasuh Bayi
             </v-card-title>
-            <v-card-text class="display-2">
+            <v-card-text class="display-2 babysitter--text">
               <div v-if="Object.entries(babysitters).length === 0">
-                <v-progress-circular indeterminate width="2" v-show="progress" color="white"></v-progress-circular>
+                <v-progress-circular indeterminate width="2" v-show="progress" color="babysitter"></v-progress-circular>
               </div>
               <div v-else>{{numberFormat(babysitters.size)}}</div>
             </v-card-text>

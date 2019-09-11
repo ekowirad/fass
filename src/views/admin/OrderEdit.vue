@@ -235,6 +235,14 @@
           <v-card flat v-if="order.labor != null">
             <v-card-title class="title green--text" primary-title>
               <v-icon left color="success">check</v-icon>Pekerja yang dipilih
+              <v-spacer></v-spacer>
+              <v-chip
+                v-if="order.labor.status != 4"
+                label
+                outline
+                @click="showWorkHistory(order.labor.work_history)"
+                :color="statusColor(order.labor.status)"
+              >{{getStatus(order.labor.status)}}</v-chip>
             </v-card-title>
             <v-card-text>
               <OrderLabor></OrderLabor>
@@ -310,10 +318,8 @@
               ></v-pagination>
             </v-footer>
           </v-card-text>
-          <v-divider></v-divider>
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="success" depressed @click="changeLabor">Pilih</v-btn>
+            <v-btn color="success" block depressed @click="changeLabor">Pilih</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -332,6 +338,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <labor-work ref="laborWorkDialog"></labor-work>
     </v-container>
   </div>
 </template>
@@ -340,10 +347,12 @@
 import moment from "moment";
 import OrderLaborReq from "../OrderLaborReq";
 import OrderLabor from "../OrderLabor";
+import LaborWork from "./LaborWork"
 export default {
   components: {
     OrderLaborReq,
-    OrderLabor
+    OrderLabor,
+    LaborWork
   },
   data() {
     return {
@@ -373,6 +382,12 @@ export default {
       date: "",
       jobs: [],
       labors: {},
+      statuses: [],
+      status_color: [
+        { color: "success", id: 4 },
+        { color: "warning", id: 5 },
+        { color: "error", id: 6 }
+      ],
       colors: [
         { id: 1, color: "blue" },
         { id: 2, color: "lime" },
@@ -391,6 +406,19 @@ export default {
     };
   },
   methods: {
+    showWorkHistory(history) {
+      this.$store.commit("labor/SET_WORK_HISTORY", history);
+      this.$refs.laborWorkDialog.dialog = true
+    },
+    statusColor(id) {
+      const status = Array.from(this.status_color).find(data => data.id == id)
+        .color;
+      console.log("color", status);
+      return status;
+    },
+    getStatus(status) {
+      return this.statuses.find(data => data.id == status).name;
+    },
     showSelectLabor() {
       this.dialog = true;
       this.search = {};
@@ -526,6 +554,7 @@ export default {
     },
     searchLabor() {
       this.isSearch = true;
+      // search labor on available status only
       this.search.status = 4;
       console.log(this.search);
       let url = this.page == 0 ? "search" : `search?page=${this.page}`;
@@ -594,11 +623,13 @@ export default {
   destroyed() {
     this.$store.commit("labor/RESET_STATE_OBJ", "orderLaborReq");
     this.$store.commit("labor/RESET_STATE_OBJ", "orderLabor");
+    this.$store.commit("labor/RESET_STATE_OBJ", "workHistory")
   },
   created() {
     this.fetchOrder(this.$route.params.data);
     this.fetchLabor();
     this.jobs = this.$store.getters["labor/jobs"];
+    this.statuses = this.$store.getters["labor/statuses"];
   }
 };
 </script>

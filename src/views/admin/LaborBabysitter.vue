@@ -1,5 +1,5 @@
 <template>
-     <div class="prt2">
+     <div class="labor-babysitter">
     <router-view :key="$route.path"></router-view>
   </div>
 </template>

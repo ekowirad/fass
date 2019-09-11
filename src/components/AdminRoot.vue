@@ -110,7 +110,7 @@ export default {
         .then(ress => {
           window.localStorage.clear()
           this.$router.push({ name: "login" })
-          this.$store.commit("labor/RESET_STATE_OBJ", "revenue")
+          // this.$store.commit("labor/RESET_STATE_OBJ", "revenue")
         })
         .catch(e => {
           console.log("error logout", e.response);
@@ -125,7 +125,7 @@ export default {
       menu: false,
       items: [
         { title: "Dashboard", icon: "dashboard", route: "dashboard" },
-        { title: "Admin", icon: "supervisor_account", route: "admin-list" },
+        // { title: "Admin", icon: "supervisor_account", route: "admin-list" },
         {
           title: "Pesanan",
           icon: "all_inbox",

@@ -17,6 +17,9 @@ Vue.use(Vuetify, {
         dark_pink: '#EC407A',
         blue: '#039BE5',
         orange: '#FF5722',
-        black:'#263238'
+        black:'#263238',
+        prt: '#934CEF',
+        caregiver: '#FFA726',
+        babysitter: '#ED3072'
     }
 })

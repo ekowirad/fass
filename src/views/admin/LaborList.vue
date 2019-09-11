@@ -13,7 +13,13 @@
                     <v-btn flat icon dark @click="laborEdit(labor.id)">
                       <v-icon>create</v-icon>
                     </v-btn>
-                    <v-btn v-if="labor.work_history.length != 0" flat icon dark @click="showWorkHistory(labor.work_history)">
+                    <v-btn
+                      v-if="labor.work_history.length != 0"
+                      flat
+                      icon
+                      dark
+                      @click="showWorkHistory(labor.work_history)"
+                    >
                       <v-icon>list_alt</v-icon>
                     </v-btn>
                   </v-toolbar>
@@ -77,57 +83,20 @@
       </v-footer>
 
       <!-- WORK HISTORY DIALOG -->
-      <v-dialog v-model="workHistoryDialog" scrollable max-width="750">
-        <v-card>
-          <v-card-title class="title">
-            <v-icon left>storage</v-icon>Rotasi Kerja
-            <v-spacer></v-spacer>
-            <v-btn flat small icon depressed @click="workHistoryDialog = false">
-              <v-icon>clear</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text style="height: 500px;">
-            <v-list two-line>
-              <template v-for="(history, index) in workHistory">
-                <v-list-tile
-                  :to="{name: 'report-order-detail', params: {data: history.id}}"
-                  :key="history.id"
-                >
-                  <v-list-tile-content class="pr-4">
-                    <v-list-tile-title>{{history.name}}</v-list-tile-title>
-                    <v-list-tile-sub-title>
-                      <v-icon class="mr-1" small>call</v-icon>
-                      {{history.handphone}}
-                    </v-list-tile-sub-title>
-                    <v-list-tile-sub-title>{{history.address}}</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                  <v-list-tile-action>
-                    <v-list-tile-action-text>{{dateFormat(history.updated_at)}}</v-list-tile-action-text>
-                    <v-chip
-                      dark
-                      label
-                      :color="colors[history.time_type-1].color"
-                    >{{timeTypes[history.time_type-1].text}}</v-chip>
-                  </v-list-tile-action>
-                </v-list-tile>
-                <v-divider v-if="index + 1 < workHistory.length" :key="index"></v-divider>
-              </template>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+      <labor-work ref="laborWorkDialog"></labor-work>
     </v-container>
   </div>
 </template>
 
 <script>
 import LaborFilter from "./LaborFilter";
+import LaborWork from "./LaborWork";
 import moment from "moment";
 export default {
   name: "LaborList",
   components: {
-    LaborFilter
+    LaborFilter,
+    LaborWork
   },
   data() {
     return {
@@ -167,13 +136,14 @@ export default {
     this.showLabor();
     this.statuses = this.$store.getters["labor/statuses"];
   },
+  destroyed() {},
   methods: {
     dateFormat(date) {
       return moment(date).format("DD/MMMM/YYYY");
     },
     showWorkHistory(workHistory) {
-      this.workHistory = workHistory;
-      this.workHistoryDialog = true;
+      this.$store.commit("labor/SET_WORK_HISTORY", workHistory);
+      this.$refs.laborWorkDialog.dialog = true;
     },
     searchFilter(search) {
       this.isSearch = true;
