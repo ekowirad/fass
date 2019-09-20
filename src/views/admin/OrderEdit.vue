@@ -617,7 +617,11 @@ export default {
       }
     },
     totalSalary() {
-      return this.salary * this.timeRange;
+      if(this.timeRange != 0){
+        return this.salary * this.timeRange;
+      } else {
+        return this.salary
+      }
     }
   },
   destroyed() {

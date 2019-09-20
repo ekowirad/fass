@@ -144,7 +144,8 @@
                   </v-menu>
                 </div>
                 <div v-if="labor.id != null" class="text-xs-right mt-4">
-                  <div class="font-weight-medium">Total Harga:</div>
+                  <div class="font-weight-medium">Perkiraan Harga:</div>
+                  <div class="caption">*belum termasuk admin</div>
                   <div class="headline font-weight-bold">Rp. {{formatPrice(total)}}</div>
                   <div
                     v-if="order.time_type != null"
