@@ -160,7 +160,7 @@ export default {
     }
   },
   created() {
-    if (Object.keys(this.$store.getters["labor/orderPayment"]).length !== 0) {
+    if (this.$store.getters["labor/orderPayment"].file != "") {
       this.readonly = true;
       this.payment = this.$store.getters["labor/orderPayment"];
       this.$store.watch(
