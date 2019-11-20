@@ -12,6 +12,7 @@ const labor = {
         orderMitra: {},
         revenue: {},
         report: {},
+        orderPayment: {file:""},
         workHistory: []
     },
     mutations: {
@@ -63,6 +64,9 @@ const labor = {
         SET_ORDER_LABOR:(state, params) =>{
             state.orderLabor = params
         },
+        SET_ORDER_PAYMENT:(state, params) =>{
+            state.orderPayment = params
+        },
         SET_ORDER_LABOR_REQ:(state, params) =>{
             state.orderLaborReq = params
         },
@@ -92,6 +96,7 @@ const labor = {
         orderLabor: state => state.orderLabor,
         orderLaborReq: state => state.orderLaborReq,
         orderMitra: state => state.orderMitra,
+        orderPayment: state => state.orderPayment,
         revenue: state => state.revenue,
         report: state => state.report,
         workHistory: state => state.workHistory

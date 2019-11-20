@@ -132,6 +132,11 @@ export default {
           route: "order-list"
         },
         {
+          title: "Konfirmasi Pembayaran",
+          icon: "done_all",
+          route: "payment-confirm"
+        },
+        {
           title: "Pemasukan dan Pengeluaran",
           icon: "swap_horiz",
           route: "income-expense"

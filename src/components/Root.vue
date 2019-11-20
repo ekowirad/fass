@@ -10,6 +10,9 @@
         <v-toolbar-items v-for="menu in menus" :key="menu.name">
           <v-btn flat @click="pushMenu(menu.link)">{{menu.name}}</v-btn>
         </v-toolbar-items>
+        <v-toolbar-items>
+          <v-btn color="success" @click="paymentMenu" flat>Konfirmasi Pembayaran</v-btn>
+        </v-toolbar-items>
       </v-toolbar>
       <v-content>
         <router-view :key="$route.fullPath"></router-view>
@@ -32,19 +35,24 @@
             </v-card-actions>
           </v-card>
         </v-footer>
+        <order-payment ref="orderPaymentDialog"/>
       </v-content>
     </v-app>
   </div>
 </template>
 
 <script>
+import OrderPayment from '../views/OrderPayment'
 export default {
+  components:{
+    OrderPayment
+  },
   data() {
     return {
       menus: [
         { name: "Beranda", link: "home" },
         { name: "Tentang Kami", link: "about" },
-        { name: "Mitra", link: "mitra" }
+        { name: "Mitra", link: "mitra" },
       ],
       contacts: [
         {name: "yayasankasihkeluarga", icon: 'fab fa-facebook'},
@@ -57,6 +65,9 @@ export default {
   methods: {
     pushMenu(link) {
       this.$router.push({ name: link });
+    },
+    paymentMenu(){
+      this.$refs.orderPaymentDialog.dialog = true
     }
   },
   created() {}

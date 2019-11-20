@@ -18,6 +18,7 @@ import OrderEdit from '../views/admin/OrderEdit'
 import IncomeExpense from '../views/admin/IncomeExpense'
 
 import Report from '../views/admin/Report'
+import ReportPayment from '../views/admin/ReportPayment'
 import ReportOrderDetail from '../views/admin/ReportOrderDetail'
 
 const admin = [
@@ -66,6 +67,15 @@ const admin = [
         ]
 
     },
+
+    // PAYMENT CONFIRM -----------------------------------------
+    {
+        path:'konfirmasi_pembayaran',
+        name: 'payment-confirm',
+        component: ReportPayment,
+
+    },
+
 
     // EXPENSE INCOME ----------------------------------------
     {
