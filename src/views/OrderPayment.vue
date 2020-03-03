@@ -52,6 +52,9 @@
               <div class="subheader">*Foto bukti pembayaran</div>
             </v-flex>
           </v-container>
+          <v-card-text>
+            <v-alert v-model="alert" outline dismissible type="error">{{alertMsg}}</v-alert>
+          </v-card-text>
           <v-card-actions v-if="!readonly">
             <v-spacer></v-spacer>
             <v-btn :disabled="loading" flat @click="pickSingleFile">
@@ -92,6 +95,8 @@ export default {
   data() {
     return {
       dialog: false,
+      alert: false,
+      alertMsg: "",
       dialogImg: false,
       dialogSucess: false,
       loading: false,
@@ -123,12 +128,15 @@ export default {
           })
           .catch(e => {
             this.loading = false;
+            this.alert = true;
+            this.alertMsg = e.response.data.message;
             console.log("err order", e.response);
           });
       }
     },
     close() {
       this.dialog = false;
+      this.alert = false
       this.$store.commit("labor/RESET_STATE_OBJ", "orderPayment");
       this.$refs.form.resetValidation();
       this.payment = {
@@ -140,6 +148,7 @@ export default {
       this.formData.append("address", this.payment.address);
       this.formData.append("note_id", this.payment.note_id);
       this.formData.append("handphone", this.payment.handphone);
+      this.formData.append("status_id", 2);
     },
     pickSingleFile() {
       this.$refs.singleFile.click();

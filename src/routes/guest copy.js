@@ -3,8 +3,6 @@ import About from '../views/About'
 import Mitra from '../views/Mitra'
 import MitraDetail from '../views/MitraDetail'
 import MitraOrder from '../views/MitraOrder'
-import Order from '../views/Order'
-
 
 const guest = [
     {
@@ -17,12 +15,12 @@ const guest = [
         name: 'about',
         component: About
     },
-    // {
-    //     path: 'pesan',
-    //     name: 'pesan',
-    //     component: Order,
+    {
+        path: 'pesan',
+        name: 'pesan',
+        component: Order,
 
-    // },
+    },
     {
         path: 'mitra',
         name: 'mitra',
@@ -37,7 +35,8 @@ const guest = [
         path: 'mitra/:data/pesan',
         name: 'mitra-order',
         component: MitraOrder
-    }
+    },
+
 
 ]
 export default guest

@@ -1,5 +1,5 @@
 <template>
-  <div class="user-about">
+  <div class="user-home">
     <div class="v-responsive" style="height:600px;">
       <v-layout row align-center justify-center fill-height>
         <v-flex xs6>
@@ -7,17 +7,16 @@
         </v-flex>
         <v-flex xs6>
           <v-card flat color="transparent">
-              <v-card-text>
-                  
-              <span class="display-2 font-weight-bold">Apa itu</span>
-              <p class="display-2 font-weight-light">Yayasan Kasih Keluarga?</p>
-              </v-card-text>
+            <v-card-text>
+              <span class="display-2 font-weight-bold">Selamat Datang</span>
+              <p class="display-2 font-weight-light">di Yayasan Kasih Keluarga</p>
+            </v-card-text>
             <v-card-text>Yayasan kasih keluarga merupakan lembaga pengasuhan pertama dan terpercaya di Bali yang berdiri sejak 1995. Lembaga ini khusus melayani Baby sitter ( Pengasuh Bayi ), pekarya kesehatan ( Pengasuh orang sakit di Rumah), Pengasuh orang tua/ Lansia di Rumah ( Care Giver ) dan Asisten Rumah Tangga ( House Maids). Staff kami sudah berpengalaman, terlatih dan profesional dalam mengelola lembaga pengasuhan Rumah Tangga. Lembaga ini terbiasa melayani tamu yang berlibur kebali khususnya daerah kuta, sanur, jimbaran,nusa dua,peti tenget, lovina,uluwatu dan Ubud. Lembaga ini mendapat ijin pendidikannya dari dari kementerian pendidikan dan penyaluran kerjanya dari kementerian tenaga kerja.Saat ini memiliki tenaga kerja tercatat 1800 orang.</v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
     </div>
-
+    
     <v-layout row align-center justify-center fill-height style="background-color: #fff">
       <v-container grid-list-md fill-height>
         <v-flex xs6>
@@ -125,22 +124,87 @@
         </v-flex>
       </v-layout>
     </v-container>
+
+    <div class="v-responsive">
+      <v-flex xs12>
+        <v-img src="https://source.unsplash.com/daily" height="400">
+          <v-container style=" background-color: rgba(0, 0, 0, 0.705);" fill-height fluid>
+            <v-layout class="text-xs-center" align-center row fill-height>
+              <v-flex xs12>
+                <span
+                  class="display-1 white--text font-weight-thin"
+                >Cari asisten rumah tangga, perawat bayi ataupun lansia?</span>
+                <br />
+                <span class="display-1 white--text font-weight-normal">Disni tempatnya</span>
+                <p></p>
+                <p>
+                  <v-btn depressed large color="white" :to="{name: 'pesan'}">Pesan Sekarang</v-btn>
+                </p>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-img>
+      </v-flex>
+    </div>
   </div>
-  
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
-      landingImg: require("@/assets/about_us3.svg")
+      landingImg: require("@/assets/about_us3.svg"),
+      apiUrl: [
+        "provinces",
+        "regencies",
+        "districts",
+        "ethnics",
+        "statuses",
+        "jobs"
+      ]
     };
+  },
+  methods: {
+    getDataLib() {
+      axios
+        .all([
+          this.dataLibReq(this.apiUrl[0]),
+          this.dataLibReq(this.apiUrl[1]),
+          this.dataLibReq(this.apiUrl[2]),
+          this.dataLibReq(this.apiUrl[3]),
+          this.dataLibReq(this.apiUrl[4]),
+          this.dataLibReq(this.apiUrl[5])
+        ])
+        .then(
+          axios.spread(
+            (provinces, regencies, districts, ethnics, statuses, jobs) => {
+              this.$store.commit("labor/SET_PROVINCES", provinces.data);
+              this.$store.commit("labor/SET_REGENCIES", regencies.data);
+              this.$store.commit("labor/SET_DISTRICTS", districts.data);
+              this.$store.commit("labor/SET_ETHNICS", ethnics.data);
+              this.$store.commit("labor/SET_STATUSES", statuses.data);
+              this.$store.commit("labor/SET_JOBS", jobs.data);
+            }
+          )
+        )
+        .catch(e => {
+          console.log("catch data lib failed: ", e.reponse);
+        });
+    },
+    dataLibReq(url) {
+      return this.$http.get(`data_lib/${url}`);
+    }
+  },
+  created() {
+    if (this.$store.getters["labor/jobs"].length != 0) {
+      console.log("data lib has been filled, check vuex");
+    } else {
+      this.getDataLib();
+    }
   }
 };
 </script>
 
-<style scoped>
-.about_img {
-  transform: scale(0.5, 0.5);
-}
+<style>
 </style>

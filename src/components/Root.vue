@@ -13,10 +13,13 @@
         <v-toolbar-items>
           <v-btn color="success" @click="paymentMenu" flat>Konfirmasi Pembayaran</v-btn>
         </v-toolbar-items>
+        <!-- <v-toolbar-items>
+          <v-btn color="success" :to="{name: 'pesan'}" depressed>Pesan</v-btn>
+        </v-toolbar-items> -->
       </v-toolbar>
       <v-content>
         <router-view :key="$route.fullPath"></router-view>
-        <v-footer style="top:100%; margin-top: 40px" absolute >
+        <v-footer style="top:100%;" absolute >
           <v-card class="flex" flat tile >
             <v-card-title class="indigo darken-4 white--text" dark>
               <strong class="subheading">Lebih Dekat Dengan Kami!</strong>
