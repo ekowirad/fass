@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <img id="img-bg" src="https://source.unsplash.com/daily" />
+    <img id="img-bg" src="../assets/bg.jpg" />
     <div id="img-bg1"></div>
     <v-app>
       <v-content>

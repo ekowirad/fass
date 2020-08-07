@@ -2,7 +2,7 @@
   <div class="user-home">
     <div class="v-responsive">
       <v-flex xs12>
-        <v-img src="https://source.unsplash.com/daily" height="600">
+        <v-img :src="landingImg" height="600">
           <v-container style=" background-color: rgba(0, 0, 0, 0.705);" fill-height fluid>
             <v-layout class="text-xs-center" align-center row fill-height>
               <v-flex xs12>
@@ -90,6 +90,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      landingImg: require("@/assets/bg.jpg"),
       labors: {},
       jobs: [],
       genders: [{ text: "Perempuan", idx: 1 }, { text: "Laki-laki", idx: 2 }],
