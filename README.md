@@ -1,29 +1,4 @@
-# fass
+# Find Assistant (Fass)
+Fass is Housemaid management system based on web. This project aim to solve housemaid foundation to digitalize their business flow and hoping that gonna ease their work flow.
+This repository is just a frontend, if you wanna full function web you need pull the backend too in https://github.com/ekowirad/fass-api.
 
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
-
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
